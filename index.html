@@ -873,9 +873,12 @@ function layerList() {
     row.className = 'li' + (d.uid===selId?' on':'');
     row.dataset.uid = d.uid;
     row.draggable = true;
+    const thumb = d.f.id === 'card'
+      ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:#fff;border-radius:2px;font-size:0.5rem;color:#aaa;font-style:italic;flex-shrink:0">note</span>`
+      : `<img src="${d.f.file}" alt="">`;
     row.innerHTML = `
       <span class="drag-handle">⠿</span>
-      <img src="${d.f.file}" alt="">
+      ${thumb}
       <span>${d.f.name}</span>
       <button onclick="event.stopPropagation();del('${d.uid}')">✕</button>
     `;
