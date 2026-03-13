@@ -353,7 +353,7 @@
     .logo { font-size: 1.45rem; }
     .tagline { display: none; }
     .btn { padding: 7px 13px; font-size: 0.72rem; }
-    .btn-ghost { display: none; }
+    .btn-ghost { padding: 7px 11px; font-size: 0.68rem; }
 
     /* App layout collapses to canvas-only */
     .app { position: relative; }
@@ -850,7 +850,7 @@ function setFlip(f){ const d=gsel(); if(!d)return; d.flip=f; document.getElement
 function togStem()  { const d=gsel(); if(!d)return; d.stem=!d.stem; render(d); document.getElementById(d.uid).classList.add('sel'); document.getElementById('stog').className='tog'+(d.stem?' on':''); }
 function bFwd(uid){ uid=uid||selId; const d=getD(uid); if(!d)return; d.z=++zc; document.getElementById(uid).style.zIndex=d.z; layerList(); }
 function bBck(uid){ uid=uid||selId; const d=getD(uid); if(!d)return; d.z=Math.max(2,d.z-2); document.getElementById(uid).style.zIndex=d.z; layerList(); }
-function delSel()  { if(selId) del(selId); }
+function delSel()  { if(selId) del(selId); else toast('Tap a flower first ✕'); }
 function del(uid)  { snap(); placed=placed.filter(d=>d.uid!==uid); document.getElementById(uid)?.remove(); if(selId===uid){selId=null;propsPanel();} ui(); toast('Flower removed'); }
 function dupOne(uid){ const d=getD(uid); if(!d)return; place(d.f, d.x+d.sz+10+d.sz/2, d.y+d.sz/2); }
 function dupSel()  { if(selId) dupOne(selId); }
@@ -945,7 +945,7 @@ function clearAll() {
 }
 
 document.addEventListener('keydown', e => {
-  if (e.target.tagName==='INPUT') return;
+  if (e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA') return;
   if ((e.ctrlKey||e.metaKey) && e.key==='z') { e.preventDefault(); undo(); }
   if (e.key==='Delete'||e.key==='Backspace') delSel();
   if ((e.ctrlKey||e.metaKey) && e.key==='d') { e.preventDefault(); dupSel(); }
