@@ -781,6 +781,12 @@ stage.addEventListener('click', e => {
   if (e.target===stage || e.target.closest('#pot') || e.target.id==='eh' || e.target.closest('.empty-hint')) {
     sel(null);
   }
+  if (window.innerWidth <= 768 && activeTab) {
+    activeTab = null;
+    document.querySelector('.palette').classList.remove('open');
+    document.querySelector('.props').classList.remove('open');
+    document.querySelectorAll('.mtab').forEach(t => t.classList.remove('on'));
+  }
 });
 
 function propsPanel() {
