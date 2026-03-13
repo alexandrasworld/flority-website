@@ -790,7 +790,7 @@ function propsPanel() {
   const d = getD(selId); if (!d) return;
   nosel.style.display='none'; selp.style.display='';
   syncSliders(d);
-  document.getElementById('stog').className = 'tog'+(d.stem?' on':'');
+  const stog = document.getElementById('stog'); if (stog) stog.className = 'tog'+(d.stem?' on':'');
   ['fn','fh','fv'].forEach(id => document.getElementById(id).classList.remove('on'));
   document.getElementById({none:'fn',h:'fh',v:'fv'}[d.flip]).classList.add('on');
 }
