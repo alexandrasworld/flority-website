@@ -319,6 +319,107 @@
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
+  /* ============ MOBILE ============ */
+  .mob-tabs { display: none; }
+
+  @media (max-width: 768px) {
+    body { height: 100dvh; }
+
+    /* Compact header */
+    header { padding: 10px 14px; }
+    .logo { font-size: 1.45rem; }
+    .tagline { display: none; }
+    .btn { padding: 7px 13px; font-size: 0.72rem; }
+    .btn-ghost { display: none; }
+
+    /* App layout collapses to canvas-only */
+    .app { position: relative; }
+
+    /* LEFT PANEL → bottom sheet */
+    .palette {
+      position: fixed; bottom: 56px; left: 0; right: 0;
+      width: 100%; height: 54vh; max-height: 440px;
+      border-right: none; border-top: 1px solid var(--border);
+      border-radius: 18px 18px 0 0;
+      transform: translateY(100%);
+      transition: transform 0.32s cubic-bezier(0.22,1,0.36,1);
+      z-index: 150; box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
+    }
+    .palette.open { transform: translateY(0); }
+
+    /* RIGHT PANEL → bottom sheet */
+    .props {
+      position: fixed; bottom: 56px; left: 0; right: 0;
+      width: 100%; height: 54vh; max-height: 440px;
+      border-left: none; border-top: 1px solid var(--border);
+      border-radius: 18px 18px 0 0;
+      transform: translateY(100%);
+      transition: transform 0.32s cubic-bezier(0.22,1,0.36,1);
+      z-index: 150; box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
+    }
+    .props.open { transform: translateY(0); }
+
+    /* Sheet handle pill */
+    .sheet-handle {
+      display: block; width: 36px; height: 4px; background: #333;
+      border-radius: 2px; margin: 10px auto 4px; flex-shrink: 0;
+    }
+
+    /* Canvas area fills screen */
+    .canvas-area { flex: 1; min-width: 0; }
+    .canvas-toolbar { padding: 8px 12px; }
+    .arr-name { font-size: 0.82rem; max-width: 140px; }
+    .canvas-wrap { align-items: flex-start; padding: 10px 0 0; }
+
+    /* Stage is scaled by JS, so it needs top-center origin */
+    #stage { transform-origin: top center; }
+
+    /* Bigger touch targets for flower controls */
+    .cbtn { font-size: 0.82rem; padding: 5px 7px; }
+    .rh { width: 20px; height: 20px; bottom: -7px; right: -7px; }
+    .pf .ctrl { top: -36px; padding: 5px 9px; gap: 4px; }
+
+    /* 3-col grid in palette */
+    .flower-grid { grid-template-columns: 1fr 1fr 1fr; padding: 10px; }
+
+    /* Bottom tab bar */
+    .mob-tabs {
+      display: flex; position: fixed; bottom: 0; left: 0; right: 0;
+      height: 56px; background: #080808; border-top: 1px solid var(--border);
+      z-index: 200;
+    }
+    .mtab {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 2px;
+      background: none; border: none; color: #444;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.58rem; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; transition: color 0.15s; padding: 6px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mtab-icon { font-size: 1.15rem; line-height: 1; }
+    .mtab.on { color: var(--cream); }
+
+    /* Toast above tab bar */
+    .toast { bottom: 68px; }
+
+    /* Share modal slides up from bottom */
+    .smodal-bg { align-items: flex-end; }
+    .smodal {
+      border-radius: 18px 18px 0 0; width: 100%; max-width: 100%;
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+    }
+
+    /* Hint text on mobile */
+    .hint-text-desk { display: none; }
+    .hint-text-mob { display: block; }
+  }
+
+  @media (min-width: 769px) {
+    .hint-text-desk { display: block; }
+    .hint-text-mob { display: none; }
+  }
+
 </style>
 </head>
 <body>
@@ -338,6 +439,7 @@
 
   <!-- LEFT PALETTE -->
   <div class="palette">
+    <span class="sheet-handle"></span>
     <div class="panel-header">
       <div class="panel-label">Flower Library</div>
       <input class="search" type="text" placeholder="Search flowers…" id="si" oninput="filter()">
@@ -370,8 +472,9 @@
 
         <div class="empty-hint" id="eh">
           <div class="hint-icon">🌸</div>
-          <div class="hint-text">Drag flowers onto canvas</div>
-          <div class="hint-sub">or double-click a flower to add</div>
+          <div class="hint-text hint-text-desk">Drag flowers onto canvas</div>
+          <div class="hint-sub hint-text-desk">or double-click a flower to add</div>
+          <div class="hint-text hint-text-mob">Tap Flowers below to add</div>
         </div>
 
         <div id="pot">
@@ -384,6 +487,7 @@
 
   <!-- RIGHT PROPS -->
   <div class="props">
+    <span class="sheet-handle"></span>
     <div class="panel-header">
       <div class="panel-label">Properties <span class="badge" id="cnt">0</span></div>
     </div>
@@ -464,6 +568,19 @@
 
 </div>
 
+<!-- Mobile bottom tab bar -->
+<div class="mob-tabs" id="mobTabs">
+  <button class="mtab" data-tab="flowers" onclick="setTab('flowers')">
+    <span class="mtab-icon">🌸</span>Flowers
+  </button>
+  <button class="mtab on" data-tab="canvas" onclick="setTab('canvas')">
+    <span class="mtab-icon">◻</span>Canvas
+  </button>
+  <button class="mtab" data-tab="edit" onclick="setTab('edit')">
+    <span class="mtab-icon">✏️</span>Edit
+  </button>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <div class="smodal-bg" id="shareBg" onclick="if(event.target===this)closeShare()">
@@ -526,6 +643,8 @@ FLOWERS.forEach((f, i) => {
   d.innerHTML = `<img src="${f.file}" alt="${f.name}"><div class="fi-name">${f.name}</div>`;
   d.addEventListener('dragstart', e => { dragF = f; e.dataTransfer.effectAllowed = 'copy'; e.dataTransfer.setDragImage(new Image(),0,0); });
   d.addEventListener('dblclick', () => addCenter(f));
+  // Mobile: tap to add
+  d.addEventListener('click', () => { if (window.innerWidth <= 768) { addCenter(f); setTab('canvas'); } });
   fg.appendChild(d);
 });
 
@@ -551,7 +670,8 @@ function od(e) {
   e.preventDefault(); stage.classList.remove('drop-zone-active');
   if (!dragF) return;
   const r = stage.getBoundingClientRect();
-  place(dragF, e.clientX - r.left, e.clientY - r.top);
+  const sc = getStageScale();
+  place(dragF, (e.clientX - r.left) / sc, (e.clientY - r.top) / sc);
   dragF = null;
 }
 
@@ -612,30 +732,55 @@ function tx(d) {
 
 function drag(el, d) {
   let sx, sy, sl, st;
+  function startDrag(cx, cy) { sx=cx; sy=cy; sl=d.x; st=d.y; }
+  function moveDrag(cx, cy) {
+    const sc = getStageScale();
+    d.x = sl+(cx-sx)/sc; d.y = st+(cy-sy)/sc;
+    el.style.left=d.x+'px'; el.style.top=d.y+'px';
+  }
   el.addEventListener('mousedown', e => {
     if (e.target.classList.contains('rh') || e.target.classList.contains('cbtn')) return;
-    e.preventDefault(); sx=e.clientX; sy=e.clientY; sl=d.x; st=d.y;
-    const mm = e2 => { d.x=sl+(e2.clientX-sx); d.y=st+(e2.clientY-sy); el.style.left=d.x+'px'; el.style.top=d.y+'px'; };
+    e.preventDefault(); startDrag(e.clientX, e.clientY);
+    const mm = e2 => moveDrag(e2.clientX, e2.clientY);
     const mu = () => { document.removeEventListener('mousemove',mm); document.removeEventListener('mouseup',mu); };
     document.addEventListener('mousemove',mm); document.addEventListener('mouseup',mu);
   });
+  el.addEventListener('touchstart', e => {
+    if (e.target.classList.contains('rh') || e.target.classList.contains('cbtn')) return;
+    e.preventDefault(); sel(d.uid);
+    const t = e.touches[0]; startDrag(t.clientX, t.clientY);
+    const tm = e2 => { e2.preventDefault(); const t2=e2.touches[0]; moveDrag(t2.clientX, t2.clientY); };
+    const tu = () => { el.removeEventListener('touchmove',tm); el.removeEventListener('touchend',tu); };
+    el.addEventListener('touchmove', tm, {passive:false});
+    el.addEventListener('touchend', tu);
+  }, {passive:false});
 }
 
 function resize(el, d) {
   const rh = el.querySelector('.rh');
+  function doResize(cx, sx, ss) {
+    const sc = getStageScale();
+    d.sz = Math.max(40, Math.min(220, ss+(cx-sx)/sc));
+    el.style.width=d.sz+'px'; el.style.height=d.sz+'px';
+    if (d.uid===selId) syncSliders(d);
+    const si = document.getElementById('st_'+d.uid);
+    if (si) { si.style.width=d.sz*.13+'px'; si.style.height=d.sz*.85+'px'; si.style.bottom=-(d.sz*.82)+'px'; }
+  }
   rh.addEventListener('mousedown', e => {
     e.stopPropagation(); e.preventDefault();
     const sx=e.clientX, ss=d.sz;
-    const mm = e2 => {
-      d.sz = Math.max(40, Math.min(220, ss+(e2.clientX-sx)));
-      el.style.width=d.sz+'px'; el.style.height=d.sz+'px';
-      if (d.uid===selId) syncSliders(d);
-      const si = document.getElementById('st_'+d.uid);
-      if (si) { si.style.width=d.sz*.13+'px'; si.style.height=d.sz*.85+'px'; si.style.bottom=-(d.sz*.82)+'px'; }
-    };
+    const mm = e2 => doResize(e2.clientX, sx, ss);
     const mu = () => { document.removeEventListener('mousemove',mm); document.removeEventListener('mouseup',mu); };
     document.addEventListener('mousemove',mm); document.addEventListener('mouseup',mu);
   });
+  rh.addEventListener('touchstart', e => {
+    e.stopPropagation(); e.preventDefault();
+    const sx=e.touches[0].clientX, ss=d.sz;
+    const tm = e2 => { e2.preventDefault(); doResize(e2.touches[0].clientX, sx, ss); };
+    const tu = () => { rh.removeEventListener('touchmove',tm); rh.removeEventListener('touchend',tu); };
+    rh.addEventListener('touchmove', tm, {passive:false});
+    rh.addEventListener('touchend', tu);
+  }, {passive:false});
 }
 
 function sel(uid) {
@@ -782,6 +927,30 @@ function toast(msg) {
   setTimeout(()=>t.classList.remove('show'),2200);
 }
 
+// ---- Mobile helpers ----
+function getStageScale() {
+  const r = stage.getBoundingClientRect();
+  return r.width > 0 ? r.width / 540 : 1;
+}
+
+function scaleStage() {
+  if (window.innerWidth > 768) { stage.style.transform = ''; return; }
+  const scale = Math.min(1, (window.innerWidth - 8) / 540);
+  stage.style.transform = `scale(${scale})`;
+  // Shrink the canvas-wrap height so it doesn't leave a huge gap
+  document.getElementById('cw').style.paddingBottom = Math.round(580 * scale - 580 + 12) + 'px';
+}
+window.addEventListener('resize', scaleStage);
+
+let activeTab = 'canvas';
+function setTab(tab) {
+  if (window.innerWidth > 768) return;
+  activeTab = tab;
+  document.querySelector('.palette').classList.toggle('open', tab === 'flowers');
+  document.querySelector('.props').classList.toggle('open', tab === 'edit');
+  document.querySelectorAll('.mtab').forEach(t => t.classList.toggle('on', t.dataset.tab === tab));
+}
+
 // ---- Share via link ----
 function generateShareLink() {
   const activeBg = document.querySelector('.bgsw.on');
@@ -858,6 +1027,7 @@ function loadFromHash() {
   } catch(e) { /* invalid hash */ }
 }
 
+scaleStage();
 ui();
 loadFromHash();
 </script>
