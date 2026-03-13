@@ -181,7 +181,7 @@
     width: 100%; height: 100%; background: #fff; border-radius: 4px;
     box-sizing: border-box; display: flex; flex-direction: column;
     box-shadow: 0 4px 16px rgba(0,0,0,0.5); overflow: hidden;
-    padding: 6px;
+    padding: 12px;
   }
   .card-handle { display: none; }
   .card-text {
@@ -729,7 +729,7 @@ function render(d) {
     ta.value = d.text || '';
     ta.addEventListener('input', () => { d.text = ta.value; });
     ta.addEventListener('mousedown', e => e.stopPropagation());
-    ta.addEventListener('touchstart', e => e.stopPropagation(), {passive:true});
+    ta.addEventListener('touchstart', e => e.stopPropagation(), {passive:false});
   } else {
     el.innerHTML = ctrlHtml + `<img src="${d.f.file}" alt="${d.f.name}" draggable="false"><div class="rh" id="rh_${d.uid}"></div>`;
   }
@@ -768,7 +768,7 @@ function drag(el, d) {
     document.addEventListener('mousemove',mm); document.addEventListener('mouseup',mu);
   });
   el.addEventListener('touchstart', e => {
-    if (e.target.classList.contains('rh') || e.target.classList.contains('cbtn')) return;
+    if (e.target.classList.contains('rh') || e.target.classList.contains('cbtn') || e.target.tagName === 'TEXTAREA') return;
     e.preventDefault(); sel(d.uid);
     const t = e.touches[0]; startDrag(t.clientX, t.clientY);
     const tm = e2 => { e2.preventDefault(); const t2=e2.touches[0]; moveDrag(t2.clientX, t2.clientY); };
