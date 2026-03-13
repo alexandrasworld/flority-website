@@ -573,9 +573,6 @@
   <button class="mtab" data-tab="flowers" onclick="setTab('flowers')">
     <span class="mtab-icon">🌸</span>Flowers
   </button>
-  <button class="mtab on" data-tab="canvas" onclick="setTab('canvas')">
-    <span class="mtab-icon">◻</span>Canvas
-  </button>
   <button class="mtab" data-tab="edit" onclick="setTab('edit')">
     <span class="mtab-icon">✏️</span>Edit
   </button>
@@ -644,7 +641,7 @@ FLOWERS.forEach((f, i) => {
   d.addEventListener('dragstart', e => { dragF = f; e.dataTransfer.effectAllowed = 'copy'; e.dataTransfer.setDragImage(new Image(),0,0); });
   d.addEventListener('dblclick', () => addCenter(f));
   // Mobile: tap to add
-  d.addEventListener('click', () => { if (window.innerWidth <= 768) { addCenter(f); setTab('canvas'); } });
+  d.addEventListener('click', () => { if (window.innerWidth <= 768) { addCenter(f); setTab('flowers'); } });
   fg.appendChild(d);
 });
 
@@ -942,9 +939,17 @@ function scaleStage() {
 }
 window.addEventListener('resize', scaleStage);
 
-let activeTab = 'canvas';
+let activeTab = null;
 function setTab(tab) {
   if (window.innerWidth > 768) return;
+  // Tap same tab again → close sheet, return to canvas
+  if (activeTab === tab) {
+    activeTab = null;
+    document.querySelector('.palette').classList.remove('open');
+    document.querySelector('.props').classList.remove('open');
+    document.querySelectorAll('.mtab').forEach(t => t.classList.remove('on'));
+    return;
+  }
   activeTab = tab;
   document.querySelector('.palette').classList.toggle('open', tab === 'flowers');
   document.querySelector('.props').classList.toggle('open', tab === 'edit');
