@@ -170,6 +170,26 @@
   }
   #pot img { width: 170px; filter: drop-shadow(0 16px 32px rgba(0,0,0,0.9)); }
 
+  /* CARD */
+  .fi-card-preview {
+    width: 56px; height: 42px; background: #fff; border-radius: 3px;
+    margin: 0 auto 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.55rem; color: #bbb; font-style: italic; letter-spacing: 0.03em;
+  }
+  .card-body {
+    width: 100%; height: 100%; background: #fff; border-radius: 4px;
+    box-sizing: border-box; padding: 10px; display: flex; flex-direction: column;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+  .card-text {
+    flex: 1; width: 100%; border: none; outline: none; background: transparent;
+    resize: none; font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.78rem; line-height: 1.5; color: #222;
+    cursor: text;
+  }
+  .card-text::placeholder { color: #ccc; font-style: italic; }
+
   /* PLACED FLOWERS — each one animates in */
   @keyframes pfDrop {
     from { opacity: 0; transform: scale(0.7) translateY(-20px); }
@@ -609,6 +629,7 @@ const FLOWERS = [
   { id:'cl', name:'Calla Lily',       file:IMGS.cl,  cat:'lily'     },
   { id:'gh', name:'Green Hydrangea',  file:IMGS.gh,  cat:'other'    },
   { id:'stem', name:'Stem',           file:IMGS.stem, cat:'stem'    },
+  { id:'card', name:'Card',           file:null,      cat:'other'   },
 ];
 
 const STEM = IMGS.stem;
@@ -630,7 +651,11 @@ FLOWERS.forEach((f, i) => {
   d.dataset.cat = f.cat;
   d.draggable = true;
   d.style.animationDelay = (i * 60) + 'ms';
-  d.innerHTML = `<img src="${f.file}" alt="${f.name}"><div class="fi-name">${f.name}</div>`;
+  if (f.id === 'card') {
+    d.innerHTML = `<div class="fi-card-preview">note</div><div class="fi-name">${f.name}</div>`;
+  } else {
+    d.innerHTML = `<img src="${f.file}" alt="${f.name}"><div class="fi-name">${f.name}</div>`;
+  }
   d.addEventListener('dragstart', e => { dragF = f; e.dataTransfer.effectAllowed = 'copy'; e.dataTransfer.setDragImage(new Image(),0,0); });
   d.addEventListener('click', () => { addCenter(f); if (window.innerWidth <= 768) setTab('flowers'); });
   fg.appendChild(d);
@@ -672,8 +697,8 @@ function addCenter(f) {
 function place(f, cx, cy) {
   snap();
   const uid = 'p' + Date.now() + Math.random().toString(36).slice(2);
-  const sz  = 100;
-  const d   = { uid, f, x: cx-sz/2, y: cy-sz/2, sz, rot:0, op:100, flip:'none', z:++zc, stem:false };
+  const sz  = f.id === 'card' ? 160 : 100;
+  const d   = { uid, f, x: cx-sz/2, y: cy-sz/2, sz, rot:0, op:100, flip:'none', z:++zc, stem:false, text:'' };
   placed.push(d);
   render(d);
   sel(uid);
@@ -689,16 +714,23 @@ function render(d) {
   el.style.cssText = `left:${d.x}px;top:${d.y}px;width:${d.sz}px;height:${d.sz}px;z-index:${d.z};opacity:${d.op/100};transform:${tx(d)}`;
   // After drop animation finishes, mark ready so transform/opacity can be set directly
   el.addEventListener('animationend', () => { el.classList.add('ready'); el.style.transform = tx(d); el.style.opacity = d.op/100; }, { once: true });
-  el.innerHTML = `
+  const ctrlHtml = `
     <div class="ctrl">
       <button class="cbtn" onclick="bFwd('${d.uid}')" title="Forward">↑</button>
       <button class="cbtn" onclick="bBck('${d.uid}')" title="Back">↓</button>
       <button class="cbtn" onclick="dupOne('${d.uid}')" title="Duplicate">⊕</button>
       <button class="cbtn del" onclick="del('${d.uid}')" title="Delete">✕</button>
-    </div>
-    <img src="${d.f.file}" alt="${d.f.name}" draggable="false">
-    <div class="rh" id="rh_${d.uid}"></div>
-  `;
+    </div>`;
+  if (d.f.id === 'card') {
+    el.innerHTML = ctrlHtml + `<div class="card-body"><textarea class="card-text" placeholder="Write your note…"></textarea></div><div class="rh" id="rh_${d.uid}"></div>`;
+    const ta = el.querySelector('.card-text');
+    ta.value = d.text || '';
+    ta.addEventListener('input', () => { d.text = ta.value; });
+    ta.addEventListener('mousedown', e => e.stopPropagation());
+    ta.addEventListener('touchstart', e => e.stopPropagation(), {passive:true});
+  } else {
+    el.innerHTML = ctrlHtml + `<img src="${d.f.file}" alt="${d.f.name}" draggable="false"><div class="rh" id="rh_${d.uid}"></div>`;
+  }
   if (d.stem) {
     const si = document.createElement('img');
     si.src = STEM; si.id = 'st_'+d.uid;
@@ -968,7 +1000,8 @@ function generateShareLink() {
       op: d.op,
       fl: d.flip === 'none' ? 0 : d.flip === 'h' ? 1 : 2,
       z: d.z,
-      st: d.stem ? 1 : 0
+      st: d.stem ? 1 : 0,
+      tx: d.text || ''
     }))
   };
   const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
@@ -1018,7 +1051,7 @@ function loadFromHash() {
         const f = FLOWERS.find(fl => fl.id === p.id);
         if (!f) return;
         const uid = 'p' + Date.now() + Math.random().toString(36).slice(2);
-        const d = { uid, f, x: p.x, y: p.y, sz: p.sz, rot: p.rot, op: p.op, flip: flipMap[p.fl] || 'none', z: p.z, stem: p.st === 1 };
+        const d = { uid, f, x: p.x, y: p.y, sz: p.sz, rot: p.rot, op: p.op, flip: flipMap[p.fl] || 'none', z: p.z, stem: p.st === 1, text: p.tx || '' };
         zc = Math.max(zc, p.z);
         placed.push(d);
         render(d);
