@@ -474,7 +474,7 @@
         <div class="empty-hint" id="eh">
           <div class="hint-icon">🌸</div>
           <div class="hint-text hint-text-desk">Drag flowers onto canvas</div>
-          <div class="hint-sub hint-text-desk">or double-click a flower to add</div>
+          <div class="hint-sub hint-text-desk">or click a flower to add</div>
           <div class="hint-text hint-text-mob">Tap Flowers below to add</div>
         </div>
 
@@ -631,9 +631,7 @@ FLOWERS.forEach((f, i) => {
   d.style.animationDelay = (i * 60) + 'ms';
   d.innerHTML = `<img src="${f.file}" alt="${f.name}"><div class="fi-name">${f.name}</div>`;
   d.addEventListener('dragstart', e => { dragF = f; e.dataTransfer.effectAllowed = 'copy'; e.dataTransfer.setDragImage(new Image(),0,0); });
-  d.addEventListener('dblclick', () => addCenter(f));
-  // Mobile: tap to add
-  d.addEventListener('click', () => { if (window.innerWidth <= 768) { addCenter(f); setTab('flowers'); } });
+  d.addEventListener('click', () => { addCenter(f); if (window.innerWidth <= 768) setTab('flowers'); });
   fg.appendChild(d);
 });
 
