@@ -921,7 +921,7 @@ function getD(uid) { return placed.find(d=>d.uid===uid)||null; }
 function gsel() { return getD(selId); }
 function toast(msg) {
   const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2000);
+  setTimeout(()=>t.classList.remove('show'),1000);
 }
 
 // ---- Mobile helpers ----
