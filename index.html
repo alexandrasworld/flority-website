@@ -879,7 +879,9 @@ function layerList() {
 
 function ui() {
   document.getElementById('cnt').textContent = placed.length;
-  document.getElementById('eh').classList.toggle('gone', placed.length>0);
+  const eh = document.getElementById('eh');
+  eh.classList.toggle('gone', placed.length > 0);
+  eh.style.display = placed.length > 0 ? 'none' : '';
   layerList();
 }
 
