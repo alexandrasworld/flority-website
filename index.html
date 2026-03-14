@@ -636,6 +636,9 @@ const FLOWERS = [
 
 const STEM = IMGS.stem;
 
+// ---- Preload all images so shared links load instantly ----
+Object.values(IMGS).forEach(src => { const i = new Image(); i.src = src; });
+
 // ---- State ----
 let placed = [];
 let selId  = null;
