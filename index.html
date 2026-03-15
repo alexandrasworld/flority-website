@@ -462,7 +462,6 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   .smodal-loading p { font-size: 0.75rem; color: #555; margin: 0; }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -1044,6 +1043,88 @@ function generateShareLink() {
   return location.origin + location.pathname + '#' + encoded;
 }
 
+function renderArrangement() {
+  const W = 540, H = 580, S = 2;
+  const cvs = document.createElement('canvas');
+  cvs.width = W * S; cvs.height = H * S;
+  const ctx = cvs.getContext('2d');
+  ctx.scale(S, S);
+
+  // Background
+  ctx.fillStyle = document.getElementById('cw').style.background || '#0a0a0a';
+  ctx.fillRect(0, 0, W, H);
+
+  // Helper: get img element already loaded in DOM
+  function domImg(src) {
+    const el = document.querySelector(`img[src="${src}"]`);
+    return (el && el.complete && el.naturalWidth) ? el : null;
+  }
+
+  // Draw vase behind flowers (z-index: 5 in CSS)
+  const vaseEl = document.querySelector('#pot img');
+  if (vaseEl && vaseEl.complete && vaseEl.naturalWidth) {
+    const vW = 170, vRatio = vaseEl.naturalHeight / vaseEl.naturalWidth;
+    ctx.drawImage(vaseEl, (W - vW) / 2, H - 24 - vW * vRatio, vW, vW * vRatio);
+  }
+
+  // Draw flowers sorted by z-index ascending (back to front)
+  [...placed].sort((a, b) => a.z - b.z).forEach(d => {
+    ctx.save();
+    ctx.globalAlpha = d.op / 100;
+    ctx.translate(d.x + d.sz / 2, d.y + d.sz / 2);
+    ctx.rotate(d.rot * Math.PI / 180);
+    if (d.flip === 'h') ctx.scale(-1, 1);
+    if (d.flip === 'v') ctx.scale(1, -1);
+
+    if (d.f.id === 'card') {
+      // White card
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(-d.sz/2, -d.sz/2, d.sz, d.sz, 4);
+      else ctx.rect(-d.sz/2, -d.sz/2, d.sz, d.sz);
+      ctx.fill();
+      // Card text with wrapping
+      if (d.text) {
+        ctx.save();
+        ctx.beginPath(); ctx.rect(-d.sz/2, -d.sz/2, d.sz, d.sz); ctx.clip();
+        const pad = 12, fs = Math.max(9, Math.round(d.sz * 0.09));
+        ctx.font = `${fs}px Georgia, serif`;
+        ctx.fillStyle = '#222';
+        ctx.textBaseline = 'top';
+        const lh = fs * 1.5, maxW = d.sz - pad * 2;
+        const lines = [];
+        d.text.split('\n').forEach(para => {
+          if (!para) { lines.push(''); return; }
+          let cur = '';
+          para.split(' ').forEach(w => {
+            const test = cur ? cur + ' ' + w : w;
+            if (ctx.measureText(test).width > maxW && cur) { lines.push(cur); cur = w; }
+            else cur = test;
+          });
+          lines.push(cur);
+        });
+        lines.forEach((l, i) => ctx.fillText(l, -d.sz/2 + pad, -d.sz/2 + pad + i * lh));
+        ctx.restore();
+      }
+    } else {
+      // Flower image
+      const img = domImg(d.f.file);
+      if (img) ctx.drawImage(img, -d.sz/2, -d.sz/2, d.sz, d.sz);
+      // Stem
+      if (d.stem) {
+        const si = domImg(STEM);
+        if (si) {
+          const sw = d.sz * 0.13, sh = d.sz * 0.85;
+          ctx.drawImage(si, -sw/2, d.sz/2 - sh * 0.18, sw, sh);
+        }
+      }
+    }
+    ctx.restore();
+  });
+
+  return cvs;
+}
+
 async function openShare() {
   if (!placed.length) { toast('Add some flowers first 🌸'); return; }
 
@@ -1056,43 +1137,7 @@ async function openShare() {
   sel(null);
 
   try {
-    // Temporarily remove mobile scale transform for clean capture
-    const prevTransform = stage.style.transform;
-    stage.style.transform = '';
-
-    // Collect card textarea values from live DOM before clone
-    const cardValues = {};
-    document.querySelectorAll('.card-text').forEach(ta => {
-      const pf = ta.closest('.pf');
-      if (pf) cardValues[pf.id] = ta.value;
-    });
-
-    const bg = document.getElementById('cw').style.background || '#0a0a0a';
-    const canvas = await html2canvas(stage, {
-      backgroundColor: bg,
-      scale: 2,
-      useCORS: true,
-      allowTaint: false,
-      logging: false,
-      onclone: (clonedDoc) => {
-        // Fix vase: html2canvas doesn't support CSS filter:drop-shadow
-        const potImg = clonedDoc.querySelector('#pot img');
-        if (potImg) potImg.style.filter = 'none';
-
-        // Fix card text: textarea .value is not in the DOM, copy to textContent
-        clonedDoc.querySelectorAll('.card-text').forEach(ta => {
-          const pf = ta.closest('.pf');
-          const text = pf ? (cardValues[pf.id] || '') : '';
-          ta.textContent = text;
-          ta.style.whiteSpace = 'pre-wrap';
-          ta.style.wordWrap = 'break-word';
-        });
-      }
-    });
-
-    stage.style.transform = prevTransform;
-
-    const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+    const blob = await new Promise(res => renderArrangement().toBlob(res, 'image/png'));
     const formData = new FormData();
     formData.append('file', blob, 'arrangement.png');
     formData.append('upload_preset', 'Flority files');
