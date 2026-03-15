@@ -1046,9 +1046,12 @@ async function openShare() {
     const prevTransform = stage.style.transform;
     stage.style.transform = '';
 
-    // Remove CSS filter from pot image — html2canvas doesn't support drop-shadow
-    const potImg = document.querySelector('#pot img');
-    potImg.style.filter = 'none';
+    // Collect card textarea values from live DOM before clone
+    const cardValues = {};
+    document.querySelectorAll('.card-text').forEach(ta => {
+      const pf = ta.closest('.pf');
+      if (pf) cardValues[pf.id] = ta.value;
+    });
 
     const bg = document.getElementById('cw').style.background || '#0a0a0a';
     const canvas = await html2canvas(stage, {
@@ -1056,11 +1059,24 @@ async function openShare() {
       scale: 2,
       useCORS: true,
       allowTaint: false,
-      logging: false
+      logging: false,
+      onclone: (clonedDoc) => {
+        // Fix vase: html2canvas doesn't support CSS filter:drop-shadow
+        const potImg = clonedDoc.querySelector('#pot img');
+        if (potImg) potImg.style.filter = 'none';
+
+        // Fix card text: textarea .value is not in the DOM, copy to textContent
+        clonedDoc.querySelectorAll('.card-text').forEach(ta => {
+          const pf = ta.closest('.pf');
+          const text = pf ? (cardValues[pf.id] || '') : '';
+          ta.textContent = text;
+          ta.style.whiteSpace = 'pre-wrap';
+          ta.style.wordWrap = 'break-word';
+        });
+      }
     });
 
     stage.style.transform = prevTransform;
-    potImg.style.filter = '';
 
     const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
     const formData = new FormData();
