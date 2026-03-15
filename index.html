@@ -1068,10 +1068,23 @@ function renderArrangement() {
   }
 
   // Draw flowers sorted by z-index ascending (back to front)
+  const stage = document.getElementById('stage');
+  const stageRect = stage.getBoundingClientRect();
+  const stageScale = stageRect.width / W;
   [...placed].sort((a, b) => a.z - b.z).forEach(d => {
     ctx.save();
     ctx.globalAlpha = d.op / 100;
-    ctx.translate(d.x + d.sz / 2, d.y + d.sz / 2);
+    const el = document.getElementById(d.uid);
+    let cx, cy;
+    if (el) {
+      const er = el.getBoundingClientRect();
+      cx = ((er.left + er.right) / 2 - stageRect.left) / stageScale;
+      cy = ((er.top + er.bottom) / 2 - stageRect.top) / stageScale;
+    } else {
+      cx = d.x + d.sz / 2;
+      cy = d.y + d.sz / 2;
+    }
+    ctx.translate(cx, cy);
     ctx.rotate(d.rot * Math.PI / 180);
     if (d.flip === 'h') ctx.scale(-1, 1);
     if (d.flip === 'v') ctx.scale(1, -1);
