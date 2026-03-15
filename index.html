@@ -1068,14 +1068,15 @@ async function openShare() {
     });
     const data = await res.json();
 
-    if (!data.secure_url) throw new Error('Upload failed');
+    if (data.error) throw new Error(data.error.message);
+    if (!data.secure_url) throw new Error('No URL returned');
 
     document.getElementById('shareLink').value = data.secure_url;
     document.getElementById('shareLoading').style.display = 'none';
     document.getElementById('shareReady').style.display = '';
   } catch (err) {
     closeShare();
-    toast('Upload failed, try again ✕');
+    toast('Error: ' + err.message);
   }
 }
 
