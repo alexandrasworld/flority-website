@@ -1046,6 +1046,10 @@ async function openShare() {
     const prevTransform = stage.style.transform;
     stage.style.transform = '';
 
+    // Remove CSS filter from pot image — html2canvas doesn't support drop-shadow
+    const potImg = document.querySelector('#pot img');
+    potImg.style.filter = 'none';
+
     const bg = document.getElementById('cw').style.background || '#0a0a0a';
     const canvas = await html2canvas(stage, {
       backgroundColor: bg,
@@ -1056,6 +1060,7 @@ async function openShare() {
     });
 
     stage.style.transform = prevTransform;
+    potImg.style.filter = '';
 
     const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
     const formData = new FormData();
