@@ -1052,14 +1052,28 @@ function generateShareLink() {
 
 function renderArrangement() {
   const W = 540, H = 580, S = 2;
+
+  // Find the topmost content (flowers + vase) so we can crop empty space at the top
+  const vaseElTmp = document.querySelector('#pot img');
+  let topY = H;
+  placed.forEach(d => { topY = Math.min(topY, d.y); });
+  if (vaseElTmp && vaseElTmp.complete && vaseElTmp.naturalWidth) {
+    const vRatioTmp = vaseElTmp.naturalHeight / vaseElTmp.naturalWidth;
+    topY = Math.min(topY, H - 24 - 170 * vRatioTmp);
+  }
+  const PAD = 28; // padding above topmost element
+  const yOff = Math.max(0, topY - PAD); // how many px to crop from the top
+  const RH = H - yOff; // rendered canvas height
+
   const cvs = document.createElement('canvas');
-  cvs.width = W * S; cvs.height = H * S;
+  cvs.width = W * S; cvs.height = RH * S;
   const ctx = cvs.getContext('2d');
   ctx.scale(S, S);
+  ctx.translate(0, -yOff); // shift content up to remove empty top space
 
   // Background
   ctx.fillStyle = document.getElementById('cw').style.background || '#0a0a0a';
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillRect(0, yOff, W, RH);
 
   // Helper: get img element already loaded in DOM
   function domImg(src) {
