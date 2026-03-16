@@ -1228,7 +1228,7 @@ async function dshareWhatsApp() {
     if (!data.secure_url) throw new Error('No URL returned');
 
     // Build WhatsApp URL and navigate
-    const waUrl = 'https://wa.me/?text=' + encodeURIComponent('Made this for you 🌷 ' + data.secure_url);
+    const waUrl = 'https://wa.me/?text=' + encodeURIComponent('I made this for you :)\n' + data.secure_url + '\n\nTry it https://flority.digital/');
     console.log('[Flority] Opening WhatsApp:', waUrl);
     window.location.href = waUrl;
   } catch (err) {
