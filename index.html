@@ -447,6 +447,33 @@
       padding-bottom: max(24px, env(safe-area-inset-bottom));
     }
 
+    /* Mobile pre-share preview overlay */
+    .mob-preview-bg {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      padding: 16px;
+    }
+    .mob-preview-bg.show { opacity: 1; pointer-events: all; }
+    .mob-preview-title {
+      color: var(--cream); font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .mob-preview-img {
+      max-width: 100%; max-height: 60vh; border-radius: 12px;
+      object-fit: contain; flex-shrink: 1;
+    }
+    .mob-preview-btns {
+      display: flex; gap: 10px; margin-top: 16px; width: 100%; max-width: 340px;
+    }
+    .mob-preview-btns button {
+      flex: 1; padding: 13px 14px; border-radius: 10px;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem;
+      font-weight: 700; cursor: pointer; border: none;
+    }
+    .mob-preview-confirm { background: var(--cream); color: var(--black); }
+    .mob-preview-cancel { background: #1a1a1a; color: #666; border: 1px solid var(--border) !important; }
+
     /* Hint text on mobile */
     .hint-text-desk { display: none; }
     .hint-text-mob { display: block; }
@@ -639,6 +666,15 @@
   </div>
 </div>
 
+<!-- Mobile pre-share preview -->
+<div class="mob-preview-bg" id="mobPreviewBg">
+  <div class="mob-preview-title">Preview before sharing</div>
+  <img class="mob-preview-img" id="mobPreviewImg" src="" alt="Arrangement preview">
+  <div class="mob-preview-btns">
+    <button class="mob-preview-confirm" onclick="confirmMobShare()">Share</button>
+    <button class="mob-preview-cancel" onclick="closeMobPreview()">Cancel</button>
+  </div>
+</div>
 
 <script>
 // Embedded image data
@@ -1146,36 +1182,64 @@ function renderArrangement() {
   return cvs;
 }
 
+let _mobShareBlob = null;
+
+function closeMobPreview() {
+  document.getElementById('mobPreviewBg').classList.remove('show');
+  const img = document.getElementById('mobPreviewImg');
+  if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+  img.src = '';
+  _mobShareBlob = null;
+}
+
+async function confirmMobShare() {
+  if (!_mobShareBlob) return;
+  const blob = _mobShareBlob;
+  closeMobPreview();
+  const name = document.getElementById('arrName').value || 'My arrangement';
+  const file = new File([blob], 'flority-arrangement.png', { type: 'image/png' });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: name, text: 'My flower arrangement 🌸' });
+      return;
+    }
+    // Fallback: upload to Cloudinary and share URL
+    const formData = new FormData();
+    formData.append('file', blob, 'arrangement.png');
+    formData.append('upload_preset', 'Flority files');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dew7hucqf/image/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    await navigator.share({ url: data.secure_url, title: name, text: 'My flower arrangement 🌸' });
+  } catch (err) {
+    if (err.name !== 'AbortError') toast('Error: ' + err.message);
+  }
+}
+
 async function openShare() {
   if (!placed.length) { toast('Add some flowers first 🌸'); return; }
 
   sel(null);
 
-  // On mobile with Web Share API — skip modal, use native share sheet
+  // On mobile with Web Share API — show preview first
   const isMobile = window.innerWidth <= 768 && navigator.share;
   if (isMobile) {
     toast('Preparing…');
     try {
-      const blob = await new Promise(res => renderArrangement().toBlob(res, 'image/png'));
-      const name = document.getElementById('arrName').value || 'My arrangement';
-      const file = new File([blob], 'flority-arrangement.png', { type: 'image/png' });
-
-      // Try sharing the image file directly (most native — shows in WhatsApp, iMessage, etc.)
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: name, text: 'My flower arrangement 🌸' });
-        return;
-      }
-
-      // Fallback: upload to Cloudinary and share URL
-      const formData = new FormData();
-      formData.append('file', blob, 'arrangement.png');
-      formData.append('upload_preset', 'Flority files');
-      const res = await fetch('https://api.cloudinary.com/v1_1/dew7hucqf/image/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error.message);
-      await navigator.share({ url: data.secure_url, title: name, text: 'My flower arrangement 🌸' });
+      const cvs = renderArrangement();
+      console.log('[Flority] renderArrangement', {
+        canvasW: cvs.width, canvasH: cvs.height,
+        scale: getStageScale(), innerWidth: window.innerWidth,
+        flowers: placed.map(d => ({ id: d.f.id, x: Math.round(d.x), y: Math.round(d.y), sz: d.sz }))
+      });
+      const blob = await new Promise(res => cvs.toBlob(res, 'image/png'));
+      _mobShareBlob = blob;
+      const url = URL.createObjectURL(blob);
+      const img = document.getElementById('mobPreviewImg');
+      img.src = url;
+      document.getElementById('mobPreviewBg').classList.add('show');
     } catch (err) {
-      if (err.name !== 'AbortError') toast('Error: ' + err.message);
+      toast('Error: ' + err.message);
     }
     return;
   }
