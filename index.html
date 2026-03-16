@@ -159,7 +159,8 @@
     background-size: 44px 44px; pointer-events: none;
   }
   #stage {
-    position: relative; width: 540px; height: 580px;
+    position: relative; width: 540px; min-width: 540px; height: 580px;
+    flex-shrink: 0;
     border-radius: 12px;
   }
   .drop-zone-active { outline: 1.5px dashed rgba(245,240,200,0.2); outline-offset: 4px; }
@@ -757,8 +758,8 @@ function od(e) {
 }
 
 function addCenter(f) {
-  const w = stage.offsetWidth, h = stage.offsetHeight;
-  place(f, w/2 + (Math.random()-.5)*80, h*.38 + (Math.random()-.5)*60);
+  // Use hardcoded stage dimensions (must match canvas W=540, H=580)
+  place(f, 270 + (Math.random()-.5)*80, 580*.38 + (Math.random()-.5)*60);
 }
 
 // ---- Place flower ----
