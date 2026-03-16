@@ -1208,29 +1208,31 @@ function dshareDownload() {
 async function dshareWhatsApp() {
   if (!_dshareBlob) return;
   const blob = _dshareBlob;
-  // Open WhatsApp window immediately (user gesture) so popup isn't blocked
-  const waWindow = window.open('about:blank', '_blank');
   closeDshare();
+
+  // Show loading state
+  const btn = document.querySelector('.dshare-wa');
   toast('Uploading image…');
+
   try {
     const formData = new FormData();
     formData.append('file', blob, 'arrangement.png');
     formData.append('upload_preset', 'Flority files');
+    console.log('[Flority] Starting Cloudinary upload…');
     const res = await fetch('https://api.cloudinary.com/v1_1/dew7hucqf/image/upload', { method: 'POST', body: formData });
+    console.log('[Flority] Cloudinary status:', res.status);
     const data = await res.json();
-    console.log('[Flority] Cloudinary response:', data);
+    console.log('[Flority] Cloudinary response:', JSON.stringify(data));
+
     if (data.error) throw new Error(data.error.message);
     if (!data.secure_url) throw new Error('No URL returned');
-    const msg = encodeURIComponent('Made this for you 🌷 ' + data.secure_url);
-    if (waWindow) {
-      waWindow.location.href = 'https://wa.me/?text=' + msg;
-    } else {
-      window.open('https://wa.me/?text=' + msg, '_blank');
-    }
-    toast('Opening WhatsApp… ✓');
+
+    // Build WhatsApp URL and navigate
+    const waUrl = 'https://wa.me/?text=' + encodeURIComponent('Made this for you 🌷 ' + data.secure_url);
+    console.log('[Flority] Opening WhatsApp:', waUrl);
+    window.location.href = waUrl;
   } catch (err) {
-    if (waWindow) waWindow.close();
-    toast('Error: ' + err.message);
+    toast('Upload failed: ' + err.message);
     console.error('[Flority] WhatsApp share error:', err);
   }
 }
