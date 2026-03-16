@@ -989,17 +989,24 @@ function toast(msg) {
 }
 
 // ---- Mobile helpers ----
+let _stageScale = 1;
+
 function getStageScale() {
-  const r = stage.getBoundingClientRect();
-  return r.width > 0 ? r.width / 540 : 1;
+  return _stageScale;
 }
 
 function scaleStage() {
-  if (window.innerWidth > 768) { stage.style.transform = ''; return; }
+  if (window.innerWidth > 768) {
+    stage.style.transform = '';
+    _stageScale = 1;
+    return;
+  }
   const scale = Math.min(1, (window.innerWidth - 8) / 540);
+  _stageScale = scale;
   stage.style.transform = `scale(${scale})`;
-  // Shrink the canvas-wrap height so it doesn't leave a huge gap
-  document.getElementById('cw').style.paddingBottom = Math.round(580 * scale - 580 + 12) + 'px';
+  // Reduce bottom space so it doesn't leave a huge gap below the scaled stage
+  const spaceBelow = Math.round(580 * (1 - scale));
+  document.getElementById('cw').style.marginBottom = '-' + spaceBelow + 'px';
 }
 window.addEventListener('resize', scaleStage);
 
@@ -1068,23 +1075,10 @@ function renderArrangement() {
   }
 
   // Draw flowers sorted by z-index ascending (back to front)
-  const stage = document.getElementById('stage');
-  const stageRect = stage.getBoundingClientRect();
-  const stageScale = stageRect.width / W;
   [...placed].sort((a, b) => a.z - b.z).forEach(d => {
     ctx.save();
     ctx.globalAlpha = d.op / 100;
-    const el = document.getElementById(d.uid);
-    let cx, cy;
-    if (el) {
-      const er = el.getBoundingClientRect();
-      cx = ((er.left + er.right) / 2 - stageRect.left) / stageScale;
-      cy = ((er.top + er.bottom) / 2 - stageRect.top) / stageScale;
-    } else {
-      cx = d.x + d.sz / 2;
-      cy = d.y + d.sz / 2;
-    }
-    ctx.translate(cx, cy);
+    ctx.translate(d.x + d.sz / 2, d.y + d.sz / 2);
     ctx.rotate(d.rot * Math.PI / 180);
     if (d.flip === 'h') ctx.scale(-1, 1);
     if (d.flip === 'v') ctx.scale(1, -1);
