@@ -1201,7 +1201,7 @@ async function confirmMobShare() {
   const file = new File([blob], 'flority-arrangement.png', { type: 'image/png' });
   try {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: name, text: 'My flower arrangement 🌸' });
+      await navigator.share({ files: [file], title: name, text: 'Made this for you 🌷 Try it: https://flority.digital/' });
       return;
     }
     // Fallback: upload to Cloudinary and share URL
@@ -1211,7 +1211,7 @@ async function confirmMobShare() {
     const res = await fetch('https://api.cloudinary.com/v1_1/dew7hucqf/image/upload', { method: 'POST', body: formData });
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
-    await navigator.share({ url: data.secure_url, title: name, text: 'My flower arrangement 🌸' });
+    await navigator.share({ url: data.secure_url, title: name, text: 'Made this for you 🌷 Try it: https://flority.digital/' });
   } catch (err) {
     if (err.name !== 'AbortError') toast('Error: ' + err.message);
   }
