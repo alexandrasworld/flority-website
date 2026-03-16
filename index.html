@@ -1207,15 +1207,22 @@ function dshareDownload() {
 
 async function dshareWhatsApp() {
   if (!_dshareBlob) return;
-  try {
-    await navigator.clipboard.write([
-      new ClipboardItem({ 'image/png': _dshareBlob })
-    ]);
-  } catch (e) { /* clipboard may fail, still open WhatsApp */ }
-  const msg = encodeURIComponent('Made this for you 🌷 Try it: https://flority.digital/');
-  window.open('https://wa.me/?text=' + msg, '_blank');
+  const blob = _dshareBlob;
   closeDshare();
-  toast('Image copied — paste it in your WhatsApp chat ✓');
+  toast('Uploading image…');
+  try {
+    const formData = new FormData();
+    formData.append('file', blob, 'arrangement.png');
+    formData.append('upload_preset', 'Flority files');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dew7hucqf/image/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    if (!data.secure_url) throw new Error('No URL returned');
+    const msg = encodeURIComponent('Made this for you 🌷 ' + data.secure_url);
+    window.open('https://wa.me/?text=' + msg, '_blank');
+  } catch (err) {
+    toast('Error: ' + err.message);
+  }
 }
 
 async function dshareNative() {
