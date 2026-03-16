@@ -313,6 +313,45 @@
   }
   .lbtn:hover { border-color: var(--cream); color: var(--cream); }
 
+  /* Pre-share preview overlay — hidden by default, styled in mobile media query */
+  .mob-preview-bg { display: none; }
+
+  /* Desktop share panel */
+  .dshare-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .dshare-bg.show { opacity: 1; pointer-events: all; }
+  .dshare-panel {
+    background: #111; border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; width: 400px; max-width: 92vw;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .dshare-title {
+    font-size: 0.75rem; font-weight: 700; color: var(--cream);
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .dshare-img {
+    width: 100%; max-height: 300px; border-radius: 10px;
+    object-fit: contain; background: #000; margin-bottom: 20px;
+  }
+  .dshare-btns { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .dshare-btn {
+    width: 100%; padding: 12px 16px; border-radius: 10px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem;
+    font-weight: 700; cursor: pointer; border: none; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .dshare-copy { background: var(--cream); color: var(--black); }
+  .dshare-copy:hover { background: var(--cream-dim); }
+  .dshare-download { background: #1a1a1a; color: var(--cream); border: 1px solid var(--border); }
+  .dshare-download:hover { border-color: var(--cream); }
+  .dshare-native { background: #1a1a1a; color: var(--cream); border: 1px solid var(--border); }
+  .dshare-native:hover { border-color: var(--cream); }
+  .dshare-cancel { background: transparent; color: #555; border: none; margin-top: 4px; font-size: 0.72rem; }
+  .dshare-cancel:hover { color: var(--cream); }
+
   /* TOAST */
   .toast {
     position: fixed; bottom: 20px; left: 50%;
@@ -411,8 +450,8 @@
 
     /* Mobile pre-share preview overlay */
     .mob-preview-bg {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.92);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      display: flex; position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+      flex-direction: column; align-items: center; justify-content: center;
       z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s;
       padding: 16px;
     }
@@ -598,6 +637,20 @@
 
 <div class="toast" id="toast"></div>
 
+
+<!-- Desktop share panel -->
+<div class="dshare-bg" id="dshareBg" onclick="if(event.target===this)closeDshare()">
+  <div class="dshare-panel">
+    <div class="dshare-title">Share your arrangement</div>
+    <img class="dshare-img" id="dshareImg" src="" alt="Arrangement preview">
+    <div class="dshare-btns">
+      <button class="dshare-btn dshare-copy" onclick="dshareCopy()">📋 Copy Image</button>
+      <button class="dshare-btn dshare-download" onclick="dshareDownload()">💾 Download PNG</button>
+      <button class="dshare-btn dshare-native" id="dshareNativeBtn" onclick="dshareNative()" style="display:none">📤 Share...</button>
+      <button class="dshare-btn dshare-cancel" onclick="closeDshare()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- Mobile pre-share preview -->
 <div class="mob-preview-bg" id="mobPreviewBg">
@@ -1116,6 +1169,51 @@ function renderArrangement() {
 }
 
 let _mobShareBlob = null;
+let _dshareBlob = null;
+
+function closeDshare() {
+  document.getElementById('dshareBg').classList.remove('show');
+  const img = document.getElementById('dshareImg');
+  if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+  img.src = '';
+  _dshareBlob = null;
+}
+
+async function dshareCopy() {
+  if (!_dshareBlob) return;
+  try {
+    await navigator.clipboard.write([
+      new ClipboardItem({ 'image/png': _dshareBlob })
+    ]);
+    closeDshare();
+    toast('Image copied! Paste it anywhere ✓');
+  } catch (err) {
+    toast('Could not copy: ' + err.message);
+  }
+}
+
+function dshareDownload() {
+  if (!_dshareBlob) return;
+  const url = URL.createObjectURL(_dshareBlob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'flority-arrangement.png';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  closeDshare();
+}
+
+async function dshareNative() {
+  if (!_dshareBlob) return;
+  const blob = _dshareBlob;
+  const name = document.getElementById('arrName').value || 'My arrangement';
+  const file = new File([blob], 'flority-arrangement.png', { type: 'image/png' });
+  closeDshare();
+  try {
+    await navigator.share({ files: [file], title: name, text: 'Made this for you 🌷 Try it: https://flority.digital/' });
+  } catch (err) {
+    if (err.name !== 'AbortError') toast('Error: ' + err.message);
+  }
+}
 
 function closeMobPreview() {
   document.getElementById('mobPreviewBg').classList.remove('show');
@@ -1175,24 +1273,22 @@ async function openShare() {
     return;
   }
 
-  // Desktop — use native share sheet directly (no preview step)
+  // Desktop — show share panel with copy/download/native options
   toast('Preparing…');
   try {
     const blob = await new Promise(res => renderArrangement().toBlob(res, 'image/png'));
-    const name = document.getElementById('arrName').value || 'My arrangement';
-    const file = new File([blob], 'flority-arrangement.png', { type: 'image/png' });
+    _dshareBlob = blob;
+    const url = URL.createObjectURL(blob);
+    document.getElementById('dshareImg').src = url;
 
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: name, text: 'Made this for you 🌷 Try it: https://flority.digital/' });
-    } else {
-      // Fallback: show preview overlay
-      _mobShareBlob = blob;
-      const url = URL.createObjectURL(blob);
-      document.getElementById('mobPreviewImg').src = url;
-      document.getElementById('mobPreviewBg').classList.add('show');
-    }
+    // Show native share button only if supported
+    const file = new File([blob], 'flority-arrangement.png', { type: 'image/png' });
+    const canNative = navigator.canShare && navigator.canShare({ files: [file] });
+    document.getElementById('dshareNativeBtn').style.display = canNative ? '' : 'none';
+
+    document.getElementById('dshareBg').classList.add('show');
   } catch (err) {
-    if (err.name !== 'AbortError') toast('Error: ' + err.message);
+    toast('Error: ' + err.message);
   }
 }
 
