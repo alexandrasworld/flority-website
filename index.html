@@ -313,7 +313,32 @@
   }
   .lbtn:hover { border-color: var(--cream); color: var(--cream); }
 
-  /* SHARE MODAL (unused — kept for reference) */
+  /* SHARE PREVIEW OVERLAY */
+  .mob-preview-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    padding: 16px;
+  }
+  .mob-preview-bg.show { opacity: 1; pointer-events: all; }
+  .mob-preview-title {
+    color: var(--cream); font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .mob-preview-img {
+    max-width: min(100%, 480px); max-height: 60vh; border-radius: 12px;
+    object-fit: contain; flex-shrink: 1;
+  }
+  .mob-preview-btns {
+    display: flex; gap: 10px; margin-top: 16px; width: 100%; max-width: 340px;
+  }
+  .mob-preview-btns button {
+    flex: 1; padding: 13px 14px; border-radius: 10px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem;
+    font-weight: 700; cursor: pointer; border: none;
+  }
+  .mob-preview-confirm { background: var(--cream); color: var(--black); }
+  .mob-preview-cancel { background: #1a1a1a; color: #666; border: 1px solid var(--border); }
 
   /* TOAST */
   .toast {
@@ -410,33 +435,6 @@
 
     /* Toast sits right above tab bar */
     .toast { bottom: 60px; }
-
-    /* Pre-share preview overlay */
-    .mob-preview-bg {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.92);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s;
-      padding: 16px;
-    }
-    .mob-preview-bg.show { opacity: 1; pointer-events: all; }
-    .mob-preview-title {
-      color: var(--cream); font-size: 0.75rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px;
-    }
-    .mob-preview-img {
-      max-width: 100%; max-height: 60vh; border-radius: 12px;
-      object-fit: contain; flex-shrink: 1;
-    }
-    .mob-preview-btns {
-      display: flex; gap: 10px; margin-top: 16px; width: 100%; max-width: 340px;
-    }
-    .mob-preview-btns button {
-      flex: 1; padding: 13px 14px; border-radius: 10px;
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem;
-      font-weight: 700; cursor: pointer; border: none;
-    }
-    .mob-preview-confirm { background: var(--cream); color: var(--black); }
-    .mob-preview-cancel { background: #1a1a1a; color: #666; border: 1px solid var(--border) !important; }
 
     /* Hint text on mobile */
     .hint-text-desk { display: none; }
