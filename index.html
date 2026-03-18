@@ -1232,17 +1232,19 @@ function renderArrangement(toName, fromName, note) {
       ctx.font = 'italic 400 13px "Space Grotesk", sans-serif';
       ctx.fillStyle = 'rgba(245,240,200,0.7)';
       ctx.textAlign = 'center';
-      // Word wrap note
+      // Word wrap note (respecting manual line breaks)
       const maxW = W - 80;
-      const words = note.split(' ');
-      let line = '';
       const noteLines = [];
-      words.forEach(w => {
-        const test = line ? line + ' ' + w : w;
-        if (ctx.measureText(test).width > maxW && line) { noteLines.push(line); line = w; }
-        else line = test;
+      note.split('\n').forEach(para => {
+        if (!para) { noteLines.push(''); return; }
+        let line = '';
+        para.split(' ').forEach(w => {
+          const test = line ? line + ' ' + w : w;
+          if (ctx.measureText(test).width > maxW && line) { noteLines.push(line); line = w; }
+          else line = test;
+        });
+        noteLines.push(line);
       });
-      noteLines.push(line);
       noteLines.forEach((l, i) => {
         const prefix = i === 0 ? '\u201C' : '';
         const suffix = i === noteLines.length - 1 ? '\u201D' : '';
