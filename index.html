@@ -137,11 +137,6 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 10px 22px; border-bottom: 1px solid var(--border); background: #080808;
   }
-  .arr-name {
-    background: transparent; border: none; color: var(--cream);
-    font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 700; outline: none;
-  }
-  .arr-name::placeholder { color: #2a2a2a; }
   .toolbar-btns { display: flex; gap: 6px; }
   .tbtn {
     width: 32px; height: 32px; border-radius: 7px; background: var(--mid);
@@ -418,7 +413,6 @@
     /* Canvas area fills screen */
     .canvas-area { flex: 1; min-width: 0; }
     .canvas-toolbar { padding: 8px 12px; }
-    .arr-name { font-size: 0.82rem; max-width: 140px; }
     .canvas-wrap { align-items: flex-start; padding: 10px 0 0; }
 
     /* Stage is scaled by JS, so it needs top-center origin */
@@ -501,6 +495,7 @@
     <div class="tagline">Your online flower arrangement app</div>
   </div>
   <div class="header-right">
+    <button class="btn btn-ghost" onclick="undo()">↩ Undo</button>
     <button class="btn btn-ghost" onclick="clearAll()">Clear all</button>
     <button class="btn btn-primary" onclick="openShare()">↗ Send to someone</button>
   </div>
@@ -528,10 +523,9 @@
 
   <!-- CANVAS -->
   <div class="canvas-area">
+    <input type="hidden" id="arrName" value="">
     <div class="canvas-toolbar">
-      <input class="arr-name" type="text" placeholder="Untitled arrangement" id="arrName">
       <div class="toolbar-btns">
-        <button class="tbtn" title="Undo (Ctrl+Z)" onclick="undo()">↩</button>
         <button class="tbtn" title="Duplicate selected" onclick="dupSel()">⊕</button>
         <button class="tbtn" title="Delete selected" onclick="delSel()">🗑</button>
       </div>
