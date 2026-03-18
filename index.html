@@ -1422,9 +1422,20 @@ async function wizWhatsApp() {
   }
 }
 
-function wizSaveImage() {
+async function wizSaveImage() {
   if (!_wizBlob) return;
-  // On mobile, open the image in a new tab so the user can long-press to save
+  // Use native share sheet which includes "Save Image" on iOS
+  const file = new File([_wizBlob], 'flority-arrangement.png', { type: 'image/png' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file] });
+      closeWiz();
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') return;
+    }
+  }
+  // Fallback: download
   const url = URL.createObjectURL(_wizBlob);
   const a = document.createElement('a');
   a.href = url; a.download = 'flority-arrangement.png';
