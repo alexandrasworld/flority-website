@@ -660,7 +660,10 @@
         <input class="swiz-input" type="text" id="swizTo" placeholder="Recipient's name" autocomplete="off">
         <label class="swiz-label">From</label>
         <input class="swiz-input" type="text" id="swizFrom" placeholder="Your name" autocomplete="off">
-        <button class="swiz-btn swiz-btn-primary" onclick="wizNext()">Next</button>
+        <div class="swiz-step-btns">
+          <button class="swiz-btn swiz-btn-secondary" onclick="wizSkipAll()">Skip</button>
+          <button class="swiz-btn swiz-btn-primary" onclick="wizNext()">Next</button>
+        </div>
       </div>
       <!-- Step 1: Note (optional) -->
       <div class="swiz-step" id="swizStep1" style="display:none">
@@ -1352,6 +1355,13 @@ function wizNext() {
 }
 
 function wizSkipNote() {
+  document.getElementById('swizNote').value = '';
+  wizGeneratePreview();
+}
+
+function wizSkipAll() {
+  document.getElementById('swizTo').value = '';
+  document.getElementById('swizFrom').value = '';
   document.getElementById('swizNote').value = '';
   wizGeneratePreview();
 }
