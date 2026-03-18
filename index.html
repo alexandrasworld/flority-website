@@ -54,6 +54,9 @@
   }
   .logo { font-size: 32px; font-weight: 900; color: var(--cream); letter-spacing: -1.5px; }
   .tagline { font-size: 11px; color: rgba(245,240,200,0.8); margin-top: 1px; }
+  .made-by { font-size: 9px; color: rgba(245,240,200,0.4); margin-top: 1px; }
+  .made-by a { color: rgba(245,240,200,0.6); text-decoration: none; }
+  .made-by a:hover { color: var(--cream); text-decoration: underline; }
   .header-right { display: flex; gap: 10px; align-items: center; }
   .btn {
     padding: 8px 18px; border-radius: 100px;
@@ -369,6 +372,7 @@
     header { padding: 10px 14px; }
     .logo { font-size: 25px; }
     .tagline { display: none; }
+    .made-by { display: none; }
     .btn { padding: 7px 13px; font-size: 0.72rem; }
     .btn-ghost { padding: 7px 11px; font-size: 0.68rem; }
 
@@ -487,6 +491,7 @@
   <div>
     <div class="logo">Flority</div>
     <div class="tagline">Your online flower arrangement app</div>
+    <div class="made-by">made with love by <a href="https://www.instagram.com/alexandra.aurielle/" target="_blank" rel="noopener">Alexandra A</a></div>
   </div>
   <div class="header-right">
     <button class="btn btn-ghost" onclick="undo()">Undo</button>
