@@ -133,11 +133,6 @@
 
   /* CENTER CANVAS */
   .canvas-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .canvas-toolbar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 22px; border-bottom: 1px solid var(--border); background: #080808;
-  }
-  .toolbar-btns { display: flex; gap: 6px; }
   .tbtn {
     width: 32px; height: 32px; border-radius: 7px; background: var(--mid);
     border: 1px solid var(--border); color: #555; cursor: pointer;
@@ -412,7 +407,6 @@
 
     /* Canvas area fills screen */
     .canvas-area { flex: 1; min-width: 0; }
-    .canvas-toolbar { padding: 8px 12px; }
     .canvas-wrap { align-items: flex-start; padding: 10px 0 0; }
 
     /* Stage is scaled by JS, so it needs top-center origin */
@@ -524,12 +518,6 @@
   <!-- CANVAS -->
   <div class="canvas-area">
     <input type="hidden" id="arrName" value="">
-    <div class="canvas-toolbar">
-      <div class="toolbar-btns">
-        <button class="tbtn" title="Duplicate selected" onclick="dupSel()">⊕</button>
-        <button class="tbtn" title="Delete selected" onclick="delSel()">🗑</button>
-      </div>
-    </div>
     <div class="canvas-wrap" id="cw">
       <div id="stage"
            ondragover="ov(event)"
