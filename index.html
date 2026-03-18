@@ -310,46 +310,72 @@
   }
   .lbtn:hover { border-color: var(--cream); color: var(--cream); }
 
-  /* Pre-share preview overlay — hidden by default, styled in mobile media query */
-  .mob-preview-bg { display: none; }
-
-  /* Desktop share panel */
-  .dshare-bg {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  /* Share wizard */
+  .swiz-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
     display: flex; align-items: center; justify-content: center;
     z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s;
   }
-  .dshare-bg.show { opacity: 1; pointer-events: all; }
-  .dshare-panel {
+  .swiz-bg.show { opacity: 1; pointer-events: all; }
+  .swiz-panel {
     background: #111; border: 1px solid var(--border);
     border-radius: 16px; padding: 24px; width: 400px; max-width: 92vw;
-    display: flex; flex-direction: column; align-items: center;
   }
-  .dshare-title {
-    font-size: 0.75rem; font-weight: 700; color: var(--cream);
-    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px;
+  .swiz-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
   }
-  .dshare-img {
-    width: 100%; max-height: 300px; border-radius: 10px;
-    object-fit: contain; background: #000; margin-bottom: 20px;
+  .swiz-back, .swiz-close {
+    background: none; border: none; color: #666; font-size: 1.1rem;
+    cursor: pointer; padding: 4px 8px; transition: color 0.15s;
   }
-  .dshare-btns { display: flex; flex-direction: column; gap: 8px; width: 100%; }
-  .dshare-btn {
+  .swiz-back:hover, .swiz-close:hover { color: var(--cream); }
+  .swiz-title {
+    font-size: 0.8rem; font-weight: 700; color: var(--cream);
+    letter-spacing: 0.08em; text-transform: uppercase; flex: 1; text-align: center;
+  }
+  .swiz-dots { display: flex; justify-content: center; gap: 6px; margin-bottom: 20px; }
+  .swiz-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #2a2a2a; transition: background 0.2s;
+  }
+  .swiz-dot.on { background: var(--cream); }
+  .swiz-step { display: flex; flex-direction: column; }
+  .swiz-label {
+    font-size: 0.72rem; font-weight: 700; color: rgba(245,240,200,0.6);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+  }
+  .swiz-input {
+    background: #0a0a0a; border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; color: var(--cream); font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem; outline: none; margin-bottom: 14px; transition: border-color 0.15s;
+  }
+  .swiz-input:focus { border-color: var(--cream); }
+  .swiz-textarea {
+    background: #0a0a0a; border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; color: var(--cream); font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem; outline: none; resize: none; height: 80px; transition: border-color 0.15s;
+  }
+  .swiz-textarea:focus { border-color: var(--cream); }
+  .swiz-char { font-size: 0.65rem; color: #444; text-align: right; margin-top: 4px; margin-bottom: 14px; }
+  .swiz-btn {
     width: 100%; padding: 12px 16px; border-radius: 10px;
     font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem;
     font-weight: 700; cursor: pointer; border: none; transition: all 0.15s;
     display: flex; align-items: center; justify-content: center; gap: 8px;
   }
-  .dshare-copy { background: var(--cream); color: var(--black); }
-  .dshare-copy:hover { background: var(--cream-dim); }
-  .dshare-wa { background: #25D366; color: #fff; }
-  .dshare-wa:hover { background: #1fb855; }
-  .dshare-download { background: #1a1a1a; color: var(--cream); border: 1px solid var(--border); }
-  .dshare-download:hover { border-color: var(--cream); }
-  .dshare-native { background: #1a1a1a; color: var(--cream); border: 1px solid var(--border); }
-  .dshare-native:hover { border-color: var(--cream); }
-  .dshare-cancel { background: transparent; color: #555; border: none; margin-top: 4px; font-size: 0.72rem; }
-  .dshare-cancel:hover { color: var(--cream); }
+  .swiz-btn-primary { background: var(--cream); color: var(--black); }
+  .swiz-btn-primary:hover { background: var(--cream-dim); }
+  .swiz-btn-secondary { background: #1a1a1a; color: var(--cream); border: 1px solid var(--border); }
+  .swiz-btn-secondary:hover { border-color: var(--cream); }
+  .swiz-btn-wa { background: #25D366; color: #fff; }
+  .swiz-btn-wa:hover { background: #1fb855; }
+  .swiz-step-btns { display: flex; gap: 8px; }
+  .swiz-step-btns .swiz-btn { flex: 1; }
+  .swiz-share-btns { display: flex; flex-direction: column; gap: 8px; }
+  .swiz-preview {
+    width: 100%; max-height: 300px; border-radius: 10px;
+    object-fit: contain; background: #000; margin-bottom: 16px;
+  }
 
   /* TOAST */
   .toast {
@@ -446,32 +472,10 @@
     /* Toast sits right above tab bar */
     .toast { bottom: 60px; }
 
-    /* Mobile pre-share preview overlay */
-    .mob-preview-bg {
-      display: flex; position: fixed; inset: 0; background: rgba(0,0,0,0.92);
-      flex-direction: column; align-items: center; justify-content: center;
-      z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s;
-      padding: 16px;
-    }
-    .mob-preview-bg.show { opacity: 1; pointer-events: all; }
-    .mob-preview-title {
-      color: var(--cream); font-size: 0.75rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px;
-    }
-    .mob-preview-img {
-      max-width: 100%; max-height: 60vh; border-radius: 12px;
-      object-fit: contain; flex-shrink: 1;
-    }
-    .mob-preview-btns {
-      display: flex; gap: 10px; margin-top: 16px; width: 100%; max-width: 340px;
-    }
-    .mob-preview-btns button {
-      flex: 1; padding: 13px 14px; border-radius: 10px;
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem;
-      font-weight: 700; cursor: pointer; border: none;
-    }
-    .mob-preview-confirm { background: var(--cream); color: var(--black); }
-    .mob-preview-cancel { background: #1a1a1a; color: #666; border: 1px solid var(--border) !important; }
+    /* Share wizard mobile adjustments */
+    .swiz-panel { border-radius: 18px 18px 0 0; max-width: 100%; }
+    .swiz-bg { align-items: flex-end; }
+    .swiz-preview { max-height: 40vh; }
 
     /* Hint text on mobile */
     .hint-text-desk { display: none; }
@@ -631,28 +635,48 @@
 <div class="toast" id="toast"></div>
 
 
-<!-- Desktop share panel -->
-<div class="dshare-bg" id="dshareBg" onclick="if(event.target===this)closeDshare()">
-  <div class="dshare-panel">
-    <div class="dshare-title">Share your arrangement</div>
-    <img class="dshare-img" id="dshareImg" src="" alt="Arrangement preview">
-    <div class="dshare-btns">
-      <button class="dshare-btn dshare-copy" onclick="dshareCopy()">📋 Copy Image</button>
-      <button class="dshare-btn dshare-wa" onclick="dshareWhatsApp()"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</button>
-      <button class="dshare-btn dshare-download" onclick="dshareDownload()">💾 Download PNG</button>
-      <button class="dshare-btn dshare-native" id="dshareNativeBtn" onclick="dshareNative()" style="display:none">📤 Share...</button>
-      <button class="dshare-btn dshare-cancel" onclick="closeDshare()">Cancel</button>
+<!-- Share wizard -->
+<div class="swiz-bg" id="swizBg" onclick="if(event.target===this)closeWiz()">
+  <div class="swiz-panel">
+    <div class="swiz-header">
+      <button class="swiz-back" id="swizBack" onclick="wizBack()" style="display:none">←</button>
+      <div class="swiz-title" id="swizTitle">Send to someone</div>
+      <button class="swiz-close" onclick="closeWiz()">✕</button>
     </div>
-  </div>
-</div>
-
-<!-- Mobile pre-share preview -->
-<div class="mob-preview-bg" id="mobPreviewBg">
-  <div class="mob-preview-title">Preview before sharing</div>
-  <img class="mob-preview-img" id="mobPreviewImg" src="" alt="Arrangement preview">
-  <div class="mob-preview-btns">
-    <button class="mob-preview-confirm" onclick="confirmMobShare()">Share</button>
-    <button class="mob-preview-cancel" onclick="closeMobPreview()">Cancel</button>
+    <div class="swiz-dots">
+      <span class="swiz-dot on" id="swizDot0"></span>
+      <span class="swiz-dot" id="swizDot1"></span>
+      <span class="swiz-dot" id="swizDot2"></span>
+    </div>
+    <div class="swiz-body" id="swizBody">
+      <!-- Step 0: To / From -->
+      <div class="swiz-step" id="swizStep0">
+        <label class="swiz-label">To</label>
+        <input class="swiz-input" type="text" id="swizTo" placeholder="Recipient's name" autocomplete="off">
+        <label class="swiz-label">From</label>
+        <input class="swiz-input" type="text" id="swizFrom" placeholder="Your name" autocomplete="off">
+        <button class="swiz-btn swiz-btn-primary" onclick="wizNext()">Next</button>
+      </div>
+      <!-- Step 1: Note (optional) -->
+      <div class="swiz-step" id="swizStep1" style="display:none">
+        <label class="swiz-label">Want to add a note?</label>
+        <textarea class="swiz-textarea" id="swizNote" placeholder="Write a short message…" maxlength="120"></textarea>
+        <div class="swiz-char"><span id="swizCharCnt">0</span>/120</div>
+        <div class="swiz-step-btns">
+          <button class="swiz-btn swiz-btn-secondary" onclick="wizSkipNote()">Skip</button>
+          <button class="swiz-btn swiz-btn-primary" onclick="wizNext()">Next</button>
+        </div>
+      </div>
+      <!-- Step 2: Preview + Share -->
+      <div class="swiz-step" id="swizStep2" style="display:none">
+        <img class="swiz-preview" id="swizPreview" src="" alt="Preview">
+        <div class="swiz-share-btns">
+          <button class="swiz-btn swiz-btn-primary" onclick="wizShare()">Share</button>
+          <button class="swiz-btn swiz-btn-wa" onclick="wizWhatsApp()"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</button>
+          <button class="swiz-btn swiz-btn-secondary" onclick="wizDownload()">Download PNG</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1065,8 +1089,13 @@ function generateShareLink() {
   return location.origin + location.pathname + '#' + encoded;
 }
 
-function renderArrangement() {
+function renderArrangement(toName, fromName, note) {
   const W = 540, H = 580, S = 2;
+
+  // Calculate how much extra space we need for personalization text at the bottom
+  const hasPersonalization = toName || fromName || note;
+  const TEXT_AREA = hasPersonalization ? 100 : 0; // extra px for text below arrangement
+  const BRAND_AREA = 30; // space for branding at very bottom
 
   // Find the topmost content (flowers + vase) so we can crop empty space at the top
   const vaseElTmp = document.querySelector('#pot img');
@@ -1076,18 +1105,19 @@ function renderArrangement() {
     const vRatioTmp = vaseElTmp.naturalHeight / vaseElTmp.naturalWidth;
     topY = Math.min(topY, H - 24 - 170 * vRatioTmp);
   }
-  const PAD = 28; // padding above topmost element
-  const yOff = Math.max(0, topY - PAD); // how many px to crop from the top
-  const RH = H - yOff; // rendered canvas height
+  const PAD = 28;
+  const yOff = Math.max(0, topY - PAD);
+  const RH = H - yOff + TEXT_AREA + BRAND_AREA;
 
   const cvs = document.createElement('canvas');
   cvs.width = W * S; cvs.height = RH * S;
   const ctx = cvs.getContext('2d');
   ctx.scale(S, S);
-  ctx.translate(0, -yOff); // shift content up to remove empty top space
+  ctx.translate(0, -yOff);
 
   // Background
-  ctx.fillStyle = document.getElementById('cw').style.background || '#0a0a0a';
+  const bgColor = document.getElementById('cw').style.background || '#0a0a0a';
+  ctx.fillStyle = bgColor;
   ctx.fillRect(0, yOff, W, RH);
 
   // Helper: get img element already loaded in DOM
@@ -1096,7 +1126,7 @@ function renderArrangement() {
     return (el && el.complete && el.naturalWidth) ? el : null;
   }
 
-  // Draw vase behind flowers (z-index: 5 in CSS)
+  // Draw vase behind flowers
   const vaseEl = document.querySelector('#pot img');
   if (vaseEl && vaseEl.complete && vaseEl.naturalWidth) {
     const vW = 170, vRatio = vaseEl.naturalHeight / vaseEl.naturalWidth;
@@ -1113,13 +1143,11 @@ function renderArrangement() {
     if (d.flip === 'v') ctx.scale(1, -1);
 
     if (d.f.id === 'card') {
-      // White card
       ctx.fillStyle = '#fff';
       ctx.beginPath();
       if (ctx.roundRect) ctx.roundRect(-d.sz/2, -d.sz/2, d.sz, d.sz, 4);
       else ctx.rect(-d.sz/2, -d.sz/2, d.sz, d.sz);
       ctx.fill();
-      // Card text with wrapping
       if (d.text) {
         ctx.save();
         ctx.beginPath(); ctx.rect(-d.sz/2, -d.sz/2, d.sz, d.sz); ctx.clip();
@@ -1143,10 +1171,8 @@ function renderArrangement() {
         ctx.restore();
       }
     } else {
-      // Flower image
       const img = domImg(d.f.file);
       if (img) ctx.drawImage(img, -d.sz/2, -d.sz/2, d.sz, d.sz);
-      // Stem
       if (d.stem) {
         const si = domImg(STEM);
         if (si) {
@@ -1158,68 +1184,203 @@ function renderArrangement() {
     ctx.restore();
   });
 
+  // ---- Personalization text area below arrangement ----
+  const textBaseY = H + 10; // start of text area (below the arrangement)
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetY = 1;
+
+  if (hasPersonalization) {
+    // Gradient overlay at transition between arrangement and text
+    const grad = ctx.createLinearGradient(0, H - 30, 0, H + 5);
+    grad.addColorStop(0, 'rgba(10,10,10,0)');
+    grad.addColorStop(1, bgColor);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, H - 30, W, 35);
+
+    let curY = textBaseY;
+
+    // "To" name — left aligned
+    if (toName) {
+      ctx.font = '400 16px "Space Grotesk", sans-serif';
+      ctx.fillStyle = 'rgba(245,240,200,0.85)';
+      ctx.textBaseline = 'top';
+      ctx.textAlign = 'left';
+      ctx.fillText('To:', 40, curY);
+      ctx.font = '700 16px "Space Grotesk", sans-serif';
+      ctx.fillText(' ' + toName, 40 + ctx.measureText('To: ').width, curY);
+    }
+
+    // "From" name — right aligned
+    if (fromName) {
+      ctx.textAlign = 'right';
+      ctx.font = '400 16px "Space Grotesk", sans-serif';
+      ctx.fillStyle = 'rgba(245,240,200,0.85)';
+      const fromLabel = 'From: ';
+      const fromFull = fromLabel + fromName;
+      ctx.fillText('From:', W - 40 - ctx.measureText(fromName).width - 4, curY);
+      ctx.font = '700 16px "Space Grotesk", sans-serif';
+      ctx.fillText(fromName, W - 40, curY);
+      ctx.textAlign = 'left';
+    }
+
+    curY += 28;
+
+    // Note — centered, italic
+    if (note) {
+      ctx.font = 'italic 400 13px "Space Grotesk", sans-serif';
+      ctx.fillStyle = 'rgba(245,240,200,0.7)';
+      ctx.textAlign = 'center';
+      // Word wrap note
+      const maxW = W - 80;
+      const words = note.split(' ');
+      let line = '';
+      const noteLines = [];
+      words.forEach(w => {
+        const test = line ? line + ' ' + w : w;
+        if (ctx.measureText(test).width > maxW && line) { noteLines.push(line); line = w; }
+        else line = test;
+      });
+      noteLines.push(line);
+      noteLines.forEach((l, i) => {
+        const prefix = i === 0 ? '\u201C' : '';
+        const suffix = i === noteLines.length - 1 ? '\u201D' : '';
+        ctx.fillText(prefix + l + suffix, W / 2, curY + i * 18);
+      });
+      ctx.textAlign = 'left';
+    }
+  }
+
+  ctx.restore();
+
+  // ---- Branding: "made with flority.digital" ----
+  ctx.save();
+  ctx.font = '400 10px "Space Grotesk", sans-serif';
+  ctx.fillStyle = 'rgba(245,240,200,0.3)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.letterSpacing = '1.5px';
+  ctx.fillText('made with flority.digital', W / 2, H + TEXT_AREA + BRAND_AREA - 8);
+  ctx.restore();
+
   return cvs;
 }
 
-let _mobShareBlob = null;
-let _dshareBlob = null;
+// ---- Share Wizard ----
+let _wizStep = 0;
+let _wizBlob = null;
 
-function closeDshare() {
-  document.getElementById('dshareBg').classList.remove('show');
-  const img = document.getElementById('dshareImg');
-  if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
-  img.src = '';
-  _dshareBlob = null;
+// Character counter for note textarea
+document.getElementById('swizNote').addEventListener('input', function() {
+  document.getElementById('swizCharCnt').textContent = this.value.length;
+});
+
+function openShare() {
+  if (!placed.length) { toast('Add some flowers first 🌸'); return; }
+  sel(null);
+  // Reset wizard
+  _wizStep = 0;
+  _wizBlob = null;
+  document.getElementById('swizTo').value = '';
+  document.getElementById('swizFrom').value = '';
+  document.getElementById('swizNote').value = '';
+  document.getElementById('swizCharCnt').textContent = '0';
+  wizShowStep(0);
+  document.getElementById('swizBg').classList.add('show');
+  setTimeout(() => document.getElementById('swizTo').focus(), 200);
 }
 
-async function dshareCopy() {
-  if (!_dshareBlob) return;
-  try {
-    await navigator.clipboard.write([
-      new ClipboardItem({ 'image/png': _dshareBlob })
-    ]);
-    closeDshare();
-    toast('Image copied! Paste it anywhere ✓');
-  } catch (err) {
-    toast('Could not copy: ' + err.message);
+function closeWiz() {
+  document.getElementById('swizBg').classList.remove('show');
+  const img = document.getElementById('swizPreview');
+  if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+  img.src = '';
+  _wizBlob = null;
+}
+
+function wizShowStep(n) {
+  _wizStep = n;
+  for (let i = 0; i < 3; i++) {
+    document.getElementById('swizStep' + i).style.display = i === n ? '' : 'none';
+    document.getElementById('swizDot' + i).classList.toggle('on', i === n);
+  }
+  document.getElementById('swizBack').style.display = n > 0 ? '' : 'none';
+  const titles = ['Send to someone', 'Add a note', 'Preview'];
+  document.getElementById('swizTitle').textContent = titles[n];
+}
+
+function wizBack() {
+  if (_wizStep > 0) wizShowStep(_wizStep - 1);
+}
+
+function wizNext() {
+  if (_wizStep === 0) {
+    const to = document.getElementById('swizTo').value.trim();
+    const from = document.getElementById('swizFrom').value.trim();
+    if (!to) { toast('Please enter a recipient name'); document.getElementById('swizTo').focus(); return; }
+    if (!from) { toast('Please enter your name'); document.getElementById('swizFrom').focus(); return; }
+    wizShowStep(1);
+    setTimeout(() => document.getElementById('swizNote').focus(), 200);
+  } else if (_wizStep === 1) {
+    wizGeneratePreview();
   }
 }
 
-function dshareDownload() {
-  if (!_dshareBlob) return;
-  const url = URL.createObjectURL(_dshareBlob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'flority-arrangement.png';
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  closeDshare();
+function wizSkipNote() {
+  document.getElementById('swizNote').value = '';
+  wizGeneratePreview();
 }
 
-async function dshareWhatsApp() {
-  if (!_dshareBlob) return;
-  const blob = _dshareBlob;
-  closeDshare();
+async function wizGeneratePreview() {
+  toast('Preparing preview…');
+  try {
+    const toName = document.getElementById('swizTo').value.trim();
+    const fromName = document.getElementById('swizFrom').value.trim();
+    const note = document.getElementById('swizNote').value.trim();
+    const cvs = renderArrangement(toName, fromName, note);
+    const blob = await new Promise(res => cvs.toBlob(res, 'image/png'));
+    _wizBlob = blob;
+    const url = URL.createObjectURL(blob);
+    document.getElementById('swizPreview').src = url;
+    wizShowStep(2);
+  } catch (err) {
+    toast('Error: ' + err.message);
+  }
+}
 
-  // Show loading state
-  const btn = document.querySelector('.dshare-wa');
+async function wizShare() {
+  if (!_wizBlob) return;
+  const blob = _wizBlob;
+  const file = new File([blob], 'flority-arrangement.png', { type: 'image/png' });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'Flority Arrangement', text: 'Made this for you 🌷 Try it: https://flority.digital/' });
+      closeWiz();
+      return;
+    }
+    // Fallback: copy to clipboard
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    closeWiz();
+    toast('Image copied! Paste it anywhere ✓');
+  } catch (err) {
+    if (err.name !== 'AbortError') toast('Error: ' + err.message);
+  }
+}
+
+async function wizWhatsApp() {
+  if (!_wizBlob) return;
+  const blob = _wizBlob;
   toast('Uploading image…');
-
   try {
     const formData = new FormData();
     formData.append('file', blob, 'arrangement.png');
     formData.append('upload_preset', 'Flority files');
-    console.log('[Flority] Starting Cloudinary upload…');
     const res = await fetch('https://api.cloudinary.com/v1_1/dew7hucqf/image/upload', { method: 'POST', body: formData });
-    console.log('[Flority] Cloudinary status:', res.status);
     const data = await res.json();
-    console.log('[Flority] Cloudinary response:', JSON.stringify(data));
-
     if (data.error) throw new Error(data.error.message);
     if (!data.secure_url) throw new Error('No URL returned');
-
-    // Build WhatsApp URL and navigate
     const waUrl = 'https://wa.me/?text=' + encodeURIComponent('I made this for you :)\n' + data.secure_url + '\n\nTry it https://flority.digital/');
-    console.log('[Flority] Opening WhatsApp:', waUrl);
     window.location.href = waUrl;
   } catch (err) {
     toast('Upload failed: ' + err.message);
@@ -1227,94 +1388,15 @@ async function dshareWhatsApp() {
   }
 }
 
-async function dshareNative() {
-  if (!_dshareBlob) return;
-  const blob = _dshareBlob;
-  const name = document.getElementById('arrName').value || 'My arrangement';
-  const file = new File([blob], 'flority-arrangement.png', { type: 'image/png' });
-  closeDshare();
-  try {
-    await navigator.share({ files: [file], title: name, text: 'Made this for you 🌷 Try it: https://flority.digital/' });
-  } catch (err) {
-    if (err.name !== 'AbortError') toast('Error: ' + err.message);
-  }
-}
-
-function closeMobPreview() {
-  document.getElementById('mobPreviewBg').classList.remove('show');
-  const img = document.getElementById('mobPreviewImg');
-  if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
-  img.src = '';
-  _mobShareBlob = null;
-}
-
-async function confirmMobShare() {
-  if (!_mobShareBlob) return;
-  const blob = _mobShareBlob;
-  closeMobPreview();
-  const name = document.getElementById('arrName').value || 'My arrangement';
-  const file = new File([blob], 'flority-arrangement.png', { type: 'image/png' });
-  try {
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: name, text: 'Made this for you 🌷 Try it: https://flority.digital/' });
-      return;
-    }
-    // Fallback: download the PNG directly
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'flority-arrangement.png';
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  } catch (err) {
-    if (err.name !== 'AbortError') toast('Error: ' + err.message);
-  }
-}
-
-async function openShare() {
-  if (!placed.length) { toast('Add some flowers first 🌸'); return; }
-
-  sel(null);
-
-  // On mobile with Web Share API — show preview first
-  const isMobile = window.innerWidth <= 768 && navigator.share;
-  if (isMobile) {
-    toast('Preparing…');
-    try {
-      const cvs = renderArrangement();
-      console.log('[Flority] renderArrangement', {
-        canvasW: cvs.width, canvasH: cvs.height,
-        scale: getStageScale(), innerWidth: window.innerWidth,
-        flowers: placed.map(d => ({ id: d.f.id, x: Math.round(d.x), y: Math.round(d.y), sz: d.sz }))
-      });
-      const blob = await new Promise(res => cvs.toBlob(res, 'image/png'));
-      _mobShareBlob = blob;
-      const url = URL.createObjectURL(blob);
-      const img = document.getElementById('mobPreviewImg');
-      img.src = url;
-      document.getElementById('mobPreviewBg').classList.add('show');
-    } catch (err) {
-      toast('Error: ' + err.message);
-    }
-    return;
-  }
-
-  // Desktop — show share panel with copy/download/native options
-  toast('Preparing…');
-  try {
-    const blob = await new Promise(res => renderArrangement().toBlob(res, 'image/png'));
-    _dshareBlob = blob;
-    const url = URL.createObjectURL(blob);
-    document.getElementById('dshareImg').src = url;
-
-    // Show native share button only if supported
-    const file = new File([blob], 'flority-arrangement.png', { type: 'image/png' });
-    const canNative = navigator.canShare && navigator.canShare({ files: [file] });
-    document.getElementById('dshareNativeBtn').style.display = canNative ? '' : 'none';
-
-    document.getElementById('dshareBg').classList.add('show');
-  } catch (err) {
-    toast('Error: ' + err.message);
-  }
+function wizDownload() {
+  if (!_wizBlob) return;
+  const url = URL.createObjectURL(_wizBlob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'flority-arrangement.png';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  closeWiz();
+  toast('Downloaded ✓');
 }
 
 
