@@ -636,7 +636,7 @@
 
 
 <!-- Share wizard -->
-<div class="swiz-bg" id="swizBg" onclick="if(event.target===this)closeWiz()">
+<div class="swiz-bg" id="swizBg">
   <div class="swiz-panel">
     <div class="swiz-header">
       <button class="swiz-back" id="swizBack" onclick="wizBack()" style="display:none">←</button>
@@ -1298,6 +1298,22 @@ function closeWiz() {
   img.src = '';
   _wizBlob = null;
 }
+
+// Close wizard only when clicking directly on the background overlay
+document.getElementById('swizBg').addEventListener('mousedown', function(e) {
+  if (e.target === this) this._bgClick = true;
+});
+document.getElementById('swizBg').addEventListener('mouseup', function(e) {
+  if (e.target === this && this._bgClick) closeWiz();
+  this._bgClick = false;
+});
+// Prevent any interaction inside the panel from closing the wizard
+document.querySelector('.swiz-panel').addEventListener('mousedown', function(e) {
+  e.stopPropagation();
+});
+document.querySelector('.swiz-panel').addEventListener('mouseup', function(e) {
+  e.stopPropagation();
+});
 
 function wizShowStep(n) {
   _wizStep = n;
