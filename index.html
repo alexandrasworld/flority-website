@@ -1704,9 +1704,12 @@ async function loadWall() {
 function renderWall() {
   const grid = document.getElementById('wallGrid');
   grid.innerHTML = '';
+  const base = 'https://res.cloudinary.com/dew7hucqf/image/upload/';
   _wallItems.forEach(item => {
-    const thumbUrl = item.secure_url.replace('/upload/', '/upload/c_fill,w_400,h_400,q_auto,f_auto/');
-    const fullUrl = item.secure_url.replace('/upload/', '/upload/w_800,q_auto,f_auto/');
+    const pid = item.public_id;
+    const fmt = item.format || 'png';
+    const thumbUrl = base + 'c_fill,w_400,h_400,q_auto,f_auto/' + pid + '.' + fmt;
+    const fullUrl = base + 'w_800,q_auto,f_auto/' + pid + '.' + fmt;
     const creator = (item.context && item.context.custom && item.context.custom.creator) || 'Anonymous';
     const card = document.createElement('div');
     card.className = 'wall-card';
