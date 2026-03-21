@@ -1142,8 +1142,10 @@ function setBg(el) {
   el.classList.add('on');
   const bg = el.dataset.bg;
   const cw = document.getElementById('cw');
-  const light = bg==='#f5f0c8';
+  const light = bg==='#f5f0e8' || bg==='#f5f0c8';
   cw.style.background = bg;
+  const hintColor = light ? 'rgba(10,10,10,0.6)' : 'rgba(245,240,200,0.8)';
+  document.querySelectorAll('.hint-text, .hint-sub').forEach(e => e.style.color = hintColor);
 }
 
 let layerDragUid = null;
