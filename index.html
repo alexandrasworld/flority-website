@@ -788,6 +788,8 @@
           <p>Proud of your creation?</p>
           <div class="sub">Submit it to the Wall of Flowers for everyone to see</div>
         </div>
+        <label class="swiz-label">Your name</label>
+        <input class="swiz-input" type="text" id="swizWallName" placeholder="e.g. Aurielle" autocomplete="off">
         <div class="swiz-step-btns">
           <button class="swiz-btn swiz-btn-secondary" onclick="wizShowStep(1)">Skip</button>
           <button class="swiz-btn swiz-btn-primary" id="wallSubmitBtn" onclick="wizSubmitToWall()">Submit to Wall</button>
@@ -1521,6 +1523,7 @@ function openShare() {
   document.getElementById('swizFrom').value = '';
   document.getElementById('swizNote').value = '';
   document.getElementById('swizCharCnt').textContent = '0';
+  document.getElementById('swizWallName').value = '';
   // Generate clean preview for wall step
   const wallCvs = renderArrangement('', '', '');
   wallCvs.toBlob(function(blob) {
@@ -1736,9 +1739,10 @@ function renderWall() {
     const fmt = item.format || 'png';
     const thumbUrl = base + 'c_fill,w_400,h_400,q_auto,f_auto/' + pid + '.' + fmt;
     const fullUrl = base + 'w_800,q_auto,f_auto/' + pid + '.' + fmt;
+    const creator = (item.context && item.context.custom && item.context.custom.creator) || '';
     const card = document.createElement('div');
     card.className = 'wall-card';
-    card.innerHTML = '<img src="' + thumbUrl + '" alt="Arrangement" loading="lazy">';
+    card.innerHTML = '<img src="' + thumbUrl + '" alt="Arrangement" loading="lazy">' + (creator ? '<div class="wall-card-info">by ' + creator + '</div>' : '');
     card.onclick = function() { openWallLightbox(fullUrl); };
     grid.appendChild(card);
   });
@@ -1764,10 +1768,12 @@ async function wizSubmitToWall() {
     const cleanCvs = renderArrangement('', '', '');
     const cleanBlob = await new Promise(res => cleanCvs.toBlob(res, 'image/png'));
     const formData = new FormData();
+    const creator = document.getElementById('swizWallName').value.trim() || 'Anonymous';
     formData.append('file', cleanBlob, 'arrangement.png');
     formData.append('upload_preset', 'flority-wall');
     formData.append('tags', 'flority-wall');
     formData.append('folder', 'wall');
+    formData.append('context', 'creator=' + creator);
     const res = await fetch('https://api.cloudinary.com/v1_1/dew7hucqf/image/upload', { method: 'POST', body: formData });
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
