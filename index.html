@@ -1683,6 +1683,13 @@ async function loadWall() {
   grid.innerHTML = '';
   try {
     const res = await fetch('https://res.cloudinary.com/dew7hucqf/image/list/flority-wall.json');
+    if (res.status === 404) {
+      // No images tagged yet — show empty state
+      loading.style.display = 'none';
+      empty.style.display = '';
+      _wallLoaded = true;
+      return;
+    }
     if (!res.ok) throw new Error('Could not load gallery');
     const data = await res.json();
     _wallItems = (data.resources || []).reverse();
