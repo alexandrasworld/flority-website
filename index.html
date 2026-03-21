@@ -1339,17 +1339,33 @@ function renderArrangement(toName, fromName, note) {
     return (el && el.complete && el.naturalWidth) ? el : null;
   }
 
-  // Draw vase behind flowers (with drop shadow matching CSS)
+  // Draw vase behind flowers (with drop shadow matching CSS: drop-shadow(0 16px 32px rgba(0,0,0,0.9)))
   const vaseEl = document.querySelector('#pot img');
   if (vaseEl && vaseEl.complete && vaseEl.naturalWidth) {
     const vW = 170, vRatio = vaseEl.naturalHeight / vaseEl.naturalWidth;
-    ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.9)';
-    ctx.shadowBlur = 32;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 16;
-    ctx.drawImage(vaseEl, (W - vW) / 2, H - 24 - vW * vRatio, vW, vW * vRatio);
-    ctx.restore();
+    const vX = (W - vW) / 2, vY = H - 24 - vW * vRatio;
+    // Draw shadow pass using offscreen canvas to get alpha-shape shadow like CSS drop-shadow
+    const offCvs = document.createElement('canvas');
+    offCvs.width = (vW + 128) * S; offCvs.height = (vW * vRatio + 128) * S;
+    const offCtx = offCvs.getContext('2d');
+    offCtx.scale(S, S);
+    offCtx.shadowColor = 'rgba(0,0,0,0.9)';
+    offCtx.shadowBlur = 64;
+    offCtx.shadowOffsetX = 0;
+    offCtx.shadowOffsetY = 16;
+    offCtx.drawImage(vaseEl, 64, 48, vW, vW * vRatio);
+    // Draw only the shadow (clear the original image area)
+    offCtx.globalCompositeOperation = 'destination-out';
+    offCtx.shadowColor = 'transparent';
+    offCtx.shadowBlur = 0;
+    offCtx.shadowOffsetX = 0;
+    offCtx.shadowOffsetY = 0;
+    offCtx.drawImage(vaseEl, 64, 48, vW, vW * vRatio);
+    offCtx.globalCompositeOperation = 'source-over';
+    // Stamp shadow onto main canvas
+    ctx.drawImage(offCvs, 0, 0, offCvs.width, offCvs.height, vX - 64, vY - 48, (vW + 128), (vW * vRatio + 128));
+    // Draw vase on top
+    ctx.drawImage(vaseEl, vX, vY, vW, vW * vRatio);
   }
 
   // Draw flowers sorted by z-index ascending (back to front)
