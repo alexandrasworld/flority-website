@@ -23,6 +23,43 @@
 <link rel="preload" href="images/img_11.webp" as="image">
 <link rel="preload" href="images/img_12.webp" as="image">
 <link rel="preload" href="images/img_13.webp" as="image">
+<link rel="preload" href="images/img_14.webp" as="image">
+<link rel="preload" href="images/img_15.webp" as="image">
+<link rel="preload" href="images/img_16.webp" as="image">
+<link rel="preload" href="images/img_17.webp" as="image">
+<link rel="preload" href="images/img_18.webp" as="image">
+<link rel="preload" href="images/img_19.webp" as="image">
+<link rel="preload" href="images/img_20.webp" as="image">
+<link rel="preload" href="images/img_21.webp" as="image">
+<link rel="preload" href="images/img_22.webp" as="image">
+<link rel="preload" href="images/img_23.webp" as="image">
+<link rel="preload" href="images/img_24.webp" as="image">
+<link rel="preload" href="images/img_25.webp" as="image">
+<link rel="preload" href="images/img_26.webp" as="image">
+<link rel="preload" href="images/img_27.webp" as="image">
+<link rel="preload" href="images/img_28.webp" as="image">
+<link rel="preload" href="images/img_29.webp" as="image">
+<link rel="preload" href="images/img_30.webp" as="image">
+<link rel="preload" href="images/img_31.webp" as="image">
+<link rel="preload" href="images/img_32.webp" as="image">
+<link rel="preload" href="images/img_33.webp" as="image">
+<link rel="preload" href="images/img_34.webp" as="image">
+<link rel="preload" href="images/img_35.webp" as="image">
+<link rel="preload" href="images/img_36.webp" as="image">
+<link rel="preload" href="images/img_37.webp" as="image">
+<link rel="preload" href="images/img_38.webp" as="image">
+<link rel="preload" href="images/img_39.webp" as="image">
+<link rel="preload" href="images/img_40.webp" as="image">
+<link rel="preload" href="images/img_41.webp" as="image">
+<link rel="preload" href="images/img_42.webp" as="image">
+<link rel="preload" href="images/img_43.webp" as="image">
+<link rel="preload" href="images/img_44.webp" as="image">
+<link rel="preload" href="images/img_45.webp" as="image">
+<link rel="preload" href="images/img_46.webp" as="image">
+<link rel="preload" href="images/img_47.webp" as="image">
+<link rel="preload" href="images/img_48.webp" as="image">
+<link rel="preload" href="images/img_49.webp" as="image">
+<link rel="preload" href="images/img_50.webp" as="image">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -380,6 +417,80 @@
   }
   /* Save to Photos = mobile only, Download PNG = desktop only */
 
+  /* WALL GALLERY */
+  .wall-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+    z-index: 9998; opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  .wall-bg.show { opacity: 1; pointer-events: all; }
+  .wall-panel {
+    max-width: 900px; margin: 0 auto; padding: 24px 20px 40px;
+  }
+  .wall-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; position: sticky; top: 0; z-index: 2;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+    padding: 16px 0 12px; border-bottom: 1px solid var(--border);
+  }
+  .wall-title {
+    font-size: 1rem; font-weight: 700; color: var(--cream);
+    letter-spacing: 0.04em;
+  }
+  .wall-close {
+    background: none; border: none; color: #666; font-size: 1.2rem;
+    cursor: pointer; padding: 4px 8px; transition: color 0.15s;
+  }
+  .wall-close:hover { color: var(--cream); }
+  .wall-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  .wall-card {
+    position: relative; border-radius: 12px; overflow: hidden;
+    background: #111; border: 1px solid var(--border);
+    cursor: pointer; transition: transform 0.2s, border-color 0.2s;
+    aspect-ratio: 1;
+  }
+  .wall-card:hover { transform: scale(1.03); border-color: rgba(245,240,200,0.3); }
+  .wall-card img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .wall-card-info {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 8px 10px; font-size: 0.65rem; font-weight: 700;
+    color: var(--cream); background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    letter-spacing: 0.03em;
+  }
+  .wall-empty, .wall-loading {
+    text-align: center; color: #555; font-size: 0.8rem;
+    padding: 60px 20px; font-weight: 600;
+  }
+  .wall-submit-prompt {
+    text-align: center; padding: 10px 0;
+  }
+  .wall-submit-prompt p {
+    color: var(--cream); font-size: 0.85rem; margin-bottom: 6px; font-weight: 600;
+  }
+  .wall-submit-prompt .sub {
+    color: #666; font-size: 0.7rem; margin-bottom: 18px;
+  }
+  .wall-lightbox {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+    z-index: 10000; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .wall-lightbox.show { opacity: 1; pointer-events: all; }
+  .wall-lightbox img {
+    max-width: 90vw; max-height: 85vh; border-radius: 12px; object-fit: contain;
+  }
+  .wall-lightbox-close {
+    position: absolute; top: 16px; right: 20px;
+    background: none; border: none; color: #888; font-size: 1.5rem;
+    cursor: pointer; z-index: 2;
+  }
+  .wall-lightbox-close:hover { color: var(--cream); }
+
   /* TOAST */
   .toast {
     position: fixed; bottom: 20px; left: 50%;
@@ -486,6 +597,11 @@
     /* Hint text on mobile */
     .hint-text-desk { display: none; }
     .hint-text-mob { display: block; }
+
+    /* Wall gallery mobile */
+    .wall-panel { padding: 16px 14px 30px; }
+    .wall-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .wall-header { padding: 12px 0 10px; }
   }
 
   @media (min-width: 769px) {
@@ -507,6 +623,7 @@
   <div class="header-right">
     <button class="btn btn-ghost" onclick="undo()">Undo</button>
     <button class="btn btn-ghost" onclick="clearAll()">Clear all</button>
+    <button class="btn btn-ghost" onclick="openWall()">Wall</button>
     <button class="btn btn-primary" onclick="openShare()">↗ Send to someone</button>
   </div>
 </header>
@@ -525,6 +642,7 @@
       <div class="cat" data-c="orchid" onclick="setCat(this)">Orchids</div>
       <div class="cat" data-c="tropical" onclick="setCat(this)">Tropical</div>
       <div class="cat" data-c="lily" onclick="setCat(this)">Lilies</div>
+      <div class="cat" data-c="greenery" onclick="setCat(this)">Greenery</div>
       <div class="cat" data-c="other" onclick="setCat(this)">Other</div>
       <div class="cat" data-c="stem" onclick="setCat(this)">Stems</div>
     </div>
@@ -636,6 +754,9 @@
   <button class="mtab" data-tab="edit" onclick="setTab('edit')">
     <span class="mtab-icon">✏️</span>Edit
   </button>
+  <button class="mtab" onclick="openWall()">
+    <span class="mtab-icon">🖼</span>Wall
+  </button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -653,6 +774,7 @@
       <span class="swiz-dot on" id="swizDot0"></span>
       <span class="swiz-dot" id="swizDot1"></span>
       <span class="swiz-dot" id="swizDot2"></span>
+      <span class="swiz-dot" id="swizDot3"></span>
     </div>
     <div class="swiz-body" id="swizBody">
       <!-- Step 0: To / From -->
@@ -691,31 +813,106 @@
           <button class="swiz-btn swiz-btn-secondary" onclick="wizSaveImage()">Save to Photos</button>
         </div>
       </div>
+      <!-- Step 3: Submit to Wall -->
+      <div class="swiz-step" id="swizStep3" style="display:none">
+        <div class="wall-submit-prompt">
+          <img class="swiz-preview" id="swizPreviewWall" src="" alt="Preview">
+          <p>Proud of your creation?</p>
+          <div class="sub">Submit it to the Wall of Flowers for everyone to see</div>
+        </div>
+        <div class="swiz-step-btns">
+          <button class="swiz-btn swiz-btn-secondary" onclick="closeWiz()">No thanks</button>
+          <button class="swiz-btn swiz-btn-primary" id="wallSubmitBtn" onclick="wizSubmitToWall()">Submit to Wall</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- Wall of Flowers gallery -->
+<div class="wall-bg" id="wallBg" onclick="if(event.target===this)closeWall()">
+  <div class="wall-panel">
+    <div class="wall-header">
+      <div class="wall-title">Wall of Flowers</div>
+      <button class="wall-close" onclick="closeWall()">&#10005;</button>
+    </div>
+    <div class="wall-loading" id="wallLoading">Loading arrangements...</div>
+    <div class="wall-empty" id="wallEmpty" style="display:none">No arrangements yet. Be the first to submit!</div>
+    <div class="wall-grid" id="wallGrid"></div>
+  </div>
+</div>
+
+<!-- Wall lightbox -->
+<div class="wall-lightbox" id="wallLightbox" onclick="if(event.target===this)closeWallLightbox()">
+  <button class="wall-lightbox-close" onclick="closeWallLightbox()">&#10005;</button>
+  <img id="wallLightboxImg" src="" alt="Arrangement">
+</div>
+
 <script>
 // Embedded image data
-const IMGS = {"wo": "images/img_01.webp", "go": "images/img_02.webp", "mo": "images/img_03.webp", "ro": "images/img_04.webp", "roh": "images/img_05.webp", "ryh": "images/img_06.webp", "bp": "images/img_07.webp", "ga": "images/img_08.webp", "pa": "images/img_09.webp", "pl": "images/img_10.webp", "cl": "images/img_11.webp", "gh": "images/img_12.webp", "stem": "images/img_13.webp"};
+const IMGS = {};
+for (let i = 1; i <= 50; i++) IMGS['f'+String(i).padStart(2,'0')] = 'images/img_'+String(i).padStart(2,'0')+'.webp';
 
 const FLOWERS = [
-  { id:'wo', name:'W&P Orchid',       file:IMGS.wo,  cat:'orchid'   },
-  { id:'go', name:'Green Orchid',     file:IMGS.go,  cat:'orchid'   },
-  { id:'mo', name:'Orchids',          file:IMGS.mo,  cat:'orchid'   },
-  { id:'ro', name:'Red Orchid',       file:IMGS.ro,  cat:'orchid'   },
-  { id:'roh',name:'Orange Hibiscus',  file:IMGS.roh, cat:'tropical' },
-  { id:'ryh',name:'Yellow Hibiscus',  file:IMGS.ryh, cat:'tropical' },
-  { id:'bp', name:'Bird of Paradise', file:IMGS.bp,  cat:'tropical' },
-  { id:'ga', name:'Green Anthurium',  file:IMGS.ga,  cat:'tropical' },
-  { id:'pa', name:'Pink Anthurium',   file:IMGS.pa,  cat:'tropical' },
-  { id:'pl', name:'Pink Lily',        file:IMGS.pl,  cat:'lily'     },
-  { id:'cl', name:'Calla Lily',       file:IMGS.cl,  cat:'lily'     },
-  { id:'gh', name:'Green Hydrangea',  file:IMGS.gh,  cat:'other'    },
-  { id:'stem', name:'Stem',           file:IMGS.stem, cat:'stem'    },
+  // Orchids
+  { id:'f01', name:'W&P Orchid',          file:IMGS.f01, cat:'orchid'   },
+  { id:'f04', name:'Green Orchid',        file:IMGS.f04, cat:'orchid'   },
+  { id:'f07', name:'Red Orchid Spray',    file:IMGS.f07, cat:'orchid'   },
+  { id:'f08', name:'Red Orchid',          file:IMGS.f08, cat:'orchid'   },
+  { id:'f16', name:'White Orchid Spray',  file:IMGS.f16, cat:'orchid'   },
+  { id:'f20', name:'White Dendrobium',    file:IMGS.f20, cat:'orchid'   },
+  { id:'f21', name:'Orange Orchid Spray', file:IMGS.f21, cat:'orchid'   },
+  { id:'f22', name:'Teal Orchid',         file:IMGS.f22, cat:'orchid'   },
+  { id:'f23', name:'Yellow Orchid',       file:IMGS.f23, cat:'orchid'   },
+  { id:'f29', name:'Orange Orchid',       file:IMGS.f29, cat:'orchid'   },
+  { id:'f37', name:'Yellow Cymbidium',    file:IMGS.f37, cat:'orchid'   },
+  { id:'f38', name:'White Orchid',        file:IMGS.f38, cat:'orchid'   },
+  { id:'f46', name:'Purple Orchid',       file:IMGS.f46, cat:'orchid'   },
+  // Tropical
+  { id:'f02', name:'Orange Hibiscus',     file:IMGS.f02, cat:'tropical' },
+  { id:'f03', name:'Yellow-Pink Hibiscus',file:IMGS.f03, cat:'tropical' },
+  { id:'f06', name:'Bird of Paradise',    file:IMGS.f06, cat:'tropical' },
+  { id:'f09', name:'Green Anthurium',     file:IMGS.f09, cat:'tropical' },
+  { id:'f10', name:'Pink Anthurium',      file:IMGS.f10, cat:'tropical' },
+  { id:'f15', name:'Peach Anthurium',     file:IMGS.f15, cat:'tropical' },
+  { id:'f17', name:'Pink Plumeria',       file:IMGS.f17, cat:'tropical' },
+  { id:'f18', name:'Pink-White Hibiscus', file:IMGS.f18, cat:'tropical' },
+  { id:'f34', name:'Red Ginger',          file:IMGS.f34, cat:'tropical' },
+  { id:'f35', name:'Yellow Hibiscus',     file:IMGS.f35, cat:'tropical' },
+  { id:'f40', name:'Gloriosa Lily',       file:IMGS.f40, cat:'tropical' },
+  { id:'f43', name:'Bird of Paradise 2',  file:IMGS.f43, cat:'tropical' },
+  { id:'f44', name:'Heliconia',           file:IMGS.f44, cat:'tropical' },
+  { id:'f49', name:'White Plumeria',      file:IMGS.f49, cat:'tropical' },
+  // Lilies
+  { id:'f05', name:'Stargazer Lily',      file:IMGS.f05, cat:'lily'     },
+  { id:'f12', name:'White Calla Lily',    file:IMGS.f12, cat:'lily'     },
+  { id:'f24', name:'Yellow Lily',         file:IMGS.f24, cat:'lily'     },
+  { id:'f25', name:'Red-Orange Lily',     file:IMGS.f25, cat:'lily'     },
+  { id:'f32', name:'Pink Lily Spray',     file:IMGS.f32, cat:'lily'     },
+  { id:'f33', name:'Yellow Calla Lilies', file:IMGS.f33, cat:'lily'     },
+  { id:'f50', name:'Blue Lily',           file:IMGS.f50, cat:'lily'     },
+  // Greenery
+  { id:'f14', name:'Green Hydrangea',     file:IMGS.f14, cat:'greenery' },
+  { id:'f27', name:'Amaranthus',          file:IMGS.f27, cat:'greenery' },
+  { id:'f36', name:'Tropical Leaves',     file:IMGS.f36, cat:'greenery' },
+  { id:'f42', name:'Taro Leaf',           file:IMGS.f42, cat:'greenery' },
+  { id:'f45', name:'Monstera',            file:IMGS.f45, cat:'greenery' },
+  { id:'f47', name:"Baby's Breath",       file:IMGS.f47, cat:'greenery' },
+  { id:'f48', name:'Pittosporum',         file:IMGS.f48, cat:'greenery' },
+  // Other
+  { id:'f11', name:'Green Chrysanthemum', file:IMGS.f11, cat:'other'    },
+  { id:'f19', name:'Forget-Me-Nots',      file:IMGS.f19, cat:'other'    },
+  { id:'f26', name:'Blue Delphinium',     file:IMGS.f26, cat:'other'    },
+  { id:'f28', name:'Orange Marigolds',    file:IMGS.f28, cat:'other'    },
+  { id:'f30', name:'Purple Stock',        file:IMGS.f30, cat:'other'    },
+  { id:'f31', name:'Marigold Cluster',    file:IMGS.f31, cat:'other'    },
+  { id:'f39', name:'Pink Gladiolus',      file:IMGS.f39, cat:'other'    },
+  { id:'f41', name:'Red Amaranthus',      file:IMGS.f41, cat:'other'    },
+  // Stem
+  { id:'f13', name:'Stem',                file:IMGS.f13, cat:'stem'     },
 ];
 
-const STEM = IMGS.stem;
+const STEM = IMGS.f13;
 
 // ---- Preload all images so shared links load instantly ----
 Object.values(IMGS).forEach(src => { const i = new Image(); i.src = src; });
@@ -1334,12 +1531,12 @@ document.querySelector('.swiz-panel').addEventListener('mouseup', function(e) {
 
 function wizShowStep(n) {
   _wizStep = n;
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 4; i++) {
     document.getElementById('swizStep' + i).style.display = i === n ? '' : 'none';
     document.getElementById('swizDot' + i).classList.toggle('on', i === n);
   }
-  document.getElementById('swizBack').style.display = n > 0 ? '' : 'none';
-  const titles = ['Send to someone', 'Add a note', 'Preview'];
+  document.getElementById('swizBack').style.display = n > 0 && n < 3 ? '' : 'none';
+  const titles = ['Send to someone', 'Add a note', 'Preview', 'Wall of Flowers'];
   document.getElementById('swizTitle').textContent = titles[n];
 }
 
@@ -1389,6 +1586,13 @@ async function wizGeneratePreview() {
   }
 }
 
+function wizAskWall() {
+  if (_wizBlob) {
+    document.getElementById('swizPreviewWall').src = URL.createObjectURL(_wizBlob);
+  }
+  wizShowStep(3);
+}
+
 async function wizShare() {
   if (!_wizBlob) return;
   const blob = _wizBlob;
@@ -1396,13 +1600,12 @@ async function wizShare() {
   try {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], text: 'Made this for you 🌷 Try it: https://flority.digital/' });
-      closeWiz();
+      wizAskWall();
       return;
     }
-    // Fallback: copy to clipboard
     await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-    closeWiz();
     toast('Image copied! Paste it anywhere ✓');
+    wizAskWall();
   } catch (err) {
     if (err.name !== 'AbortError') toast('Error: ' + err.message);
   }
@@ -1430,25 +1633,23 @@ async function wizWhatsApp() {
 
 async function wizSaveImage() {
   if (!_wizBlob) return;
-  // Use native share sheet which includes "Save Image" on iOS
   const file = new File([_wizBlob], 'flority-arrangement.png', { type: 'image/png' });
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     try {
       await navigator.share({ files: [file] });
-      closeWiz();
+      wizAskWall();
       return;
     } catch (err) {
       if (err.name === 'AbortError') return;
     }
   }
-  // Fallback: download
   const url = URL.createObjectURL(_wizBlob);
   const a = document.createElement('a');
   a.href = url; a.download = 'flority-arrangement.png';
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  closeWiz();
   toast('Image saved ✓');
+  wizAskWall();
 }
 
 function wizDownload() {
@@ -1458,8 +1659,98 @@ function wizDownload() {
   a.href = url; a.download = 'flority-arrangement.png';
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  closeWiz();
   toast('Downloaded ✓');
+  wizAskWall();
+}
+
+// ---- Wall of Flowers ----
+let _wallLoaded = false;
+let _wallItems = [];
+
+function openWall() {
+  document.getElementById('wallBg').classList.add('show');
+  if (!_wallLoaded) loadWall();
+}
+
+function closeWall() {
+  document.getElementById('wallBg').classList.remove('show');
+}
+
+async function loadWall() {
+  const loading = document.getElementById('wallLoading');
+  const empty = document.getElementById('wallEmpty');
+  const grid = document.getElementById('wallGrid');
+  loading.style.display = '';
+  empty.style.display = 'none';
+  grid.innerHTML = '';
+  try {
+    const res = await fetch('https://res.cloudinary.com/dew7hucqf/image/list/flority-wall.json');
+    if (!res.ok) throw new Error('Could not load gallery');
+    const data = await res.json();
+    _wallItems = (data.resources || []).reverse();
+    _wallLoaded = true;
+    loading.style.display = 'none';
+    if (!_wallItems.length) {
+      empty.style.display = '';
+      return;
+    }
+    renderWall();
+  } catch (err) {
+    loading.textContent = 'Could not load the wall. Try again later.';
+    console.error('[Flority] Wall load error:', err);
+  }
+}
+
+function renderWall() {
+  const grid = document.getElementById('wallGrid');
+  grid.innerHTML = '';
+  _wallItems.forEach(item => {
+    const thumbUrl = item.secure_url.replace('/upload/', '/upload/c_fill,w_400,h_400,q_auto,f_auto/');
+    const fullUrl = item.secure_url.replace('/upload/', '/upload/w_800,q_auto,f_auto/');
+    const creator = (item.context && item.context.custom && item.context.custom.creator) || 'Anonymous';
+    const card = document.createElement('div');
+    card.className = 'wall-card';
+    card.innerHTML = '<img src="' + thumbUrl + '" alt="Arrangement" loading="lazy"><div class="wall-card-info">by ' + creator + '</div>';
+    card.onclick = function() { openWallLightbox(fullUrl); };
+    grid.appendChild(card);
+  });
+}
+
+function openWallLightbox(url) {
+  document.getElementById('wallLightboxImg').src = url;
+  document.getElementById('wallLightbox').classList.add('show');
+}
+
+function closeWallLightbox() {
+  document.getElementById('wallLightbox').classList.remove('show');
+  document.getElementById('wallLightboxImg').src = '';
+}
+
+async function wizSubmitToWall() {
+  if (!_wizBlob) return;
+  const btn = document.getElementById('wallSubmitBtn');
+  btn.textContent = 'Submitting...';
+  btn.disabled = true;
+  try {
+    const creator = document.getElementById('swizFrom').value.trim() || 'Anonymous';
+    const formData = new FormData();
+    formData.append('file', _wizBlob, 'arrangement.png');
+    formData.append('upload_preset', 'Flority files');
+    formData.append('tags', 'flority-wall');
+    formData.append('context', 'creator=' + creator);
+    const res = await fetch('https://api.cloudinary.com/v1_1/dew7hucqf/image/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    toast('Submitted to the Wall!');
+    _wallLoaded = false;
+    closeWiz();
+  } catch (err) {
+    toast('Submission failed: ' + err.message);
+    console.error('[Flority] Wall submit error:', err);
+  } finally {
+    btn.textContent = 'Submit to Wall';
+    btn.disabled = false;
+  }
 }
 
 
