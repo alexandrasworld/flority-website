@@ -1745,6 +1745,8 @@ async function wizSubmitToWall() {
     const formData = new FormData();
     formData.append('file', cleanBlob, 'arrangement.png');
     formData.append('upload_preset', 'flority-wall');
+    formData.append('tags', 'flority-wall');
+    formData.append('folder', 'wall');
     const res = await fetch('https://api.cloudinary.com/v1_1/dew7hucqf/image/upload', { method: 'POST', body: formData });
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
