@@ -594,6 +594,9 @@
     .swiz-mobile-btns { display: flex; }
     .swiz-desktop-btns { display: none; }
 
+    /* Hide wall button on mobile (use bottom tab instead) */
+    .wall-desk-btn { display: none; }
+
     /* Hint text on mobile */
     .hint-text-desk { display: none; }
     .hint-text-mob { display: block; }
@@ -623,7 +626,7 @@
   <div class="header-right">
     <button class="btn btn-ghost" onclick="undo()">Undo</button>
     <button class="btn btn-ghost" onclick="clearAll()">Clear all</button>
-    <button class="btn btn-ghost" onclick="openWall()">Wall</button>
+    <button class="btn btn-ghost wall-desk-btn" onclick="openWall()">Wall</button>
     <button class="btn btn-primary" onclick="openShare()">↗ Send to someone</button>
   </div>
 </header>
