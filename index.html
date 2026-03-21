@@ -1339,11 +1339,17 @@ function renderArrangement(toName, fromName, note) {
     return (el && el.complete && el.naturalWidth) ? el : null;
   }
 
-  // Draw vase behind flowers
+  // Draw vase behind flowers (with drop shadow matching CSS)
   const vaseEl = document.querySelector('#pot img');
   if (vaseEl && vaseEl.complete && vaseEl.naturalWidth) {
     const vW = 170, vRatio = vaseEl.naturalHeight / vaseEl.naturalWidth;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.9)';
+    ctx.shadowBlur = 32;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 16;
     ctx.drawImage(vaseEl, (W - vW) / 2, H - 24 - vW * vRatio, vW, vW * vRatio);
+    ctx.restore();
   }
 
   // Draw flowers sorted by z-index ascending (back to front)
