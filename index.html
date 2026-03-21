@@ -777,8 +777,20 @@
       <span class="swiz-dot" id="swizDot3"></span>
     </div>
     <div class="swiz-body" id="swizBody">
-      <!-- Step 0: To / From -->
+      <!-- Step 0: Submit to Wall -->
       <div class="swiz-step" id="swizStep0">
+        <div class="wall-submit-prompt">
+          <img class="swiz-preview" id="swizPreviewWall" src="" alt="Preview">
+          <p>Proud of your creation?</p>
+          <div class="sub">Submit it to the Wall of Flowers for everyone to see</div>
+        </div>
+        <div class="swiz-step-btns">
+          <button class="swiz-btn swiz-btn-secondary" onclick="wizShowStep(1)">Skip</button>
+          <button class="swiz-btn swiz-btn-primary" id="wallSubmitBtn" onclick="wizSubmitToWall()">Submit to Wall</button>
+        </div>
+      </div>
+      <!-- Step 1: To / From -->
+      <div class="swiz-step" id="swizStep1" style="display:none">
         <label class="swiz-label">To</label>
         <input class="swiz-input" type="text" id="swizTo" placeholder="Recipient's name" autocomplete="off">
         <label class="swiz-label">From</label>
@@ -788,8 +800,8 @@
           <button class="swiz-btn swiz-btn-primary" onclick="wizNext()">Next</button>
         </div>
       </div>
-      <!-- Step 1: Note (optional) -->
-      <div class="swiz-step" id="swizStep1" style="display:none">
+      <!-- Step 2: Note (optional) -->
+      <div class="swiz-step" id="swizStep2" style="display:none">
         <label class="swiz-label">Want to add a note?</label>
         <textarea class="swiz-textarea" id="swizNote" placeholder="Write a short message…" maxlength="120"></textarea>
         <div class="swiz-char"><span id="swizCharCnt">0</span>/120</div>
@@ -798,8 +810,8 @@
           <button class="swiz-btn swiz-btn-primary" onclick="wizNext()">Next</button>
         </div>
       </div>
-      <!-- Step 2: Preview + Share -->
-      <div class="swiz-step" id="swizStep2" style="display:none">
+      <!-- Step 3: Preview + Share -->
+      <div class="swiz-step" id="swizStep3" style="display:none">
         <img class="swiz-preview" id="swizPreview" src="" alt="Preview">
         <!-- Desktop buttons -->
         <div class="swiz-share-btns swiz-desktop-btns">
@@ -811,18 +823,6 @@
         <div class="swiz-share-btns swiz-mobile-btns">
           <button class="swiz-btn swiz-btn-primary" onclick="wizShare()">Share</button>
           <button class="swiz-btn swiz-btn-secondary" onclick="wizSaveImage()">Save to Photos</button>
-        </div>
-      </div>
-      <!-- Step 3: Submit to Wall -->
-      <div class="swiz-step" id="swizStep3" style="display:none">
-        <div class="wall-submit-prompt">
-          <img class="swiz-preview" id="swizPreviewWall" src="" alt="Preview">
-          <p>Proud of your creation?</p>
-          <div class="sub">Submit it to the Wall of Flowers for everyone to see</div>
-        </div>
-        <div class="swiz-step-btns">
-          <button class="swiz-btn swiz-btn-secondary" onclick="closeWiz()">No thanks</button>
-          <button class="swiz-btn swiz-btn-primary" id="wallSubmitBtn" onclick="wizSubmitToWall()">Submit to Wall</button>
         </div>
       </div>
     </div>
@@ -1500,9 +1500,13 @@ function openShare() {
   document.getElementById('swizFrom').value = '';
   document.getElementById('swizNote').value = '';
   document.getElementById('swizCharCnt').textContent = '0';
+  // Generate clean preview for wall step
+  const wallCvs = renderArrangement('', '', '');
+  wallCvs.toBlob(function(blob) {
+    document.getElementById('swizPreviewWall').src = URL.createObjectURL(blob);
+  }, 'image/png');
   wizShowStep(0);
   document.getElementById('swizBg').classList.add('show');
-  setTimeout(() => document.getElementById('swizTo').focus(), 200);
 }
 
 function closeWiz() {
@@ -1535,24 +1539,24 @@ function wizShowStep(n) {
     document.getElementById('swizStep' + i).style.display = i === n ? '' : 'none';
     document.getElementById('swizDot' + i).classList.toggle('on', i === n);
   }
-  document.getElementById('swizBack').style.display = n > 0 && n < 3 ? '' : 'none';
-  const titles = ['Send to someone', 'Add a note', 'Preview', 'Wall of Flowers'];
+  document.getElementById('swizBack').style.display = n > 1 ? '' : 'none';
+  const titles = ['Wall of Flowers', 'Send to someone', 'Add a note', 'Preview'];
   document.getElementById('swizTitle').textContent = titles[n];
 }
 
 function wizBack() {
-  if (_wizStep > 0) wizShowStep(_wizStep - 1);
+  if (_wizStep > 1) wizShowStep(_wizStep - 1);
 }
 
 function wizNext() {
-  if (_wizStep === 0) {
+  if (_wizStep === 1) {
     const to = document.getElementById('swizTo').value.trim();
     const from = document.getElementById('swizFrom').value.trim();
     if (!to) { toast('Please enter a recipient name'); document.getElementById('swizTo').focus(); return; }
     if (!from) { toast('Please enter your name'); document.getElementById('swizFrom').focus(); return; }
-    wizShowStep(1);
+    wizShowStep(2);
     setTimeout(() => document.getElementById('swizNote').focus(), 200);
-  } else if (_wizStep === 1) {
+  } else if (_wizStep === 2) {
     wizGeneratePreview();
   }
 }
@@ -1569,6 +1573,7 @@ function wizSkipAll() {
   wizGeneratePreview();
 }
 
+
 async function wizGeneratePreview() {
   toast('Preparing preview…');
   try {
@@ -1580,17 +1585,10 @@ async function wizGeneratePreview() {
     _wizBlob = blob;
     const url = URL.createObjectURL(blob);
     document.getElementById('swizPreview').src = url;
-    wizShowStep(2);
+    wizShowStep(3);
   } catch (err) {
     toast('Error: ' + err.message);
   }
-}
-
-function wizAskWall() {
-  if (_wizBlob) {
-    document.getElementById('swizPreviewWall').src = URL.createObjectURL(_wizBlob);
-  }
-  wizShowStep(3);
 }
 
 async function wizShare() {
@@ -1600,12 +1598,12 @@ async function wizShare() {
   try {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], text: 'Made this for you 🌷 Try it: https://flority.digital/' });
-      wizAskWall();
+      closeWiz();
       return;
     }
     await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    closeWiz();
     toast('Image copied! Paste it anywhere ✓');
-    wizAskWall();
   } catch (err) {
     if (err.name !== 'AbortError') toast('Error: ' + err.message);
   }
@@ -1648,8 +1646,8 @@ async function wizSaveImage() {
   a.href = url; a.download = 'flority-arrangement.png';
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  closeWiz();
   toast('Image saved ✓');
-  wizAskWall();
 }
 
 function wizDownload() {
@@ -1659,8 +1657,8 @@ function wizDownload() {
   a.href = url; a.download = 'flority-arrangement.png';
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  closeWiz();
   toast('Downloaded ✓');
-  wizAskWall();
 }
 
 // ---- Wall of Flowers ----
@@ -1710,10 +1708,9 @@ function renderWall() {
     const fmt = item.format || 'png';
     const thumbUrl = base + 'c_fill,w_400,h_400,q_auto,f_auto/' + pid + '.' + fmt;
     const fullUrl = base + 'w_800,q_auto,f_auto/' + pid + '.' + fmt;
-    const creator = (item.context && item.context.custom && item.context.custom.creator) || 'Anonymous';
     const card = document.createElement('div');
     card.className = 'wall-card';
-    card.innerHTML = '<img src="' + thumbUrl + '" alt="Arrangement" loading="lazy"><div class="wall-card-info">by ' + creator + '</div>';
+    card.innerHTML = '<img src="' + thumbUrl + '" alt="Arrangement" loading="lazy">';
     card.onclick = function() { openWallLightbox(fullUrl); };
     grid.appendChild(card);
   });
@@ -1738,17 +1735,15 @@ async function wizSubmitToWall() {
     // Render a clean image with NO names/notes for privacy
     const cleanCvs = renderArrangement('', '', '');
     const cleanBlob = await new Promise(res => cleanCvs.toBlob(res, 'image/png'));
-    const creator = document.getElementById('swizFrom').value.trim() || 'Anonymous';
     const formData = new FormData();
     formData.append('file', cleanBlob, 'arrangement.png');
     formData.append('upload_preset', 'flority-wall');
-    formData.append('context', 'creator=' + creator);
     const res = await fetch('https://api.cloudinary.com/v1_1/dew7hucqf/image/upload', { method: 'POST', body: formData });
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
     toast('Submitted to the Wall!');
     _wallLoaded = false;
-    closeWiz();
+    wizShowStep(1);
   } catch (err) {
     toast('Submission failed: ' + err.message);
     console.error('[Flority] Wall submit error:', err);
