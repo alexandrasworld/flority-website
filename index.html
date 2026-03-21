@@ -1405,8 +1405,15 @@ function renderArrangement(toName, fromName, note) {
 
   if (hasPersonalization) {
     // Gradient overlay at transition between arrangement and text
+    // Parse bgColor to get RGB values for transparent gradient
+    const tmpCvs = document.createElement('canvas');
+    tmpCvs.width = 1; tmpCvs.height = 1;
+    const tmpCtx = tmpCvs.getContext('2d');
+    tmpCtx.fillStyle = bgColor;
+    tmpCtx.fillRect(0, 0, 1, 1);
+    const [rr, gg, bb] = tmpCtx.getImageData(0, 0, 1, 1).data;
     const grad = ctx.createLinearGradient(0, H - 30, 0, H + 5);
-    grad.addColorStop(0, 'rgba(10,10,10,0)');
+    grad.addColorStop(0, 'rgba(' + rr + ',' + gg + ',' + bb + ',0)');
     grad.addColorStop(1, bgColor);
     ctx.fillStyle = grad;
     ctx.fillRect(0, H - 30, W, 35);
