@@ -1730,14 +1730,17 @@ function closeWallLightbox() {
 }
 
 async function wizSubmitToWall() {
-  if (!_wizBlob) return;
+  if (!placed.length) return;
   const btn = document.getElementById('wallSubmitBtn');
   btn.textContent = 'Submitting...';
   btn.disabled = true;
   try {
+    // Render a clean image with NO names/notes for privacy
+    const cleanCvs = renderArrangement('', '', '');
+    const cleanBlob = await new Promise(res => cleanCvs.toBlob(res, 'image/png'));
     const creator = document.getElementById('swizFrom').value.trim() || 'Anonymous';
     const formData = new FormData();
-    formData.append('file', _wizBlob, 'arrangement.png');
+    formData.append('file', cleanBlob, 'arrangement.png');
     formData.append('upload_preset', 'Flority files');
     formData.append('context', 'creator=' + creator);
     const res = await fetch('https://api.cloudinary.com/v1_1/dew7hucqf/image/upload', { method: 'POST', body: formData });
