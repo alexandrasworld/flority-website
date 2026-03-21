@@ -1735,8 +1735,7 @@ async function wizSubmitToWall() {
     const creator = document.getElementById('swizFrom').value.trim() || 'Anonymous';
     const formData = new FormData();
     formData.append('file', _wizBlob, 'arrangement.png');
-    formData.append('upload_preset', 'Flority files');
-    formData.append('tags', 'flority-wall');
+    formData.append('upload_preset', 'flority-wall');
     formData.append('context', 'creator=' + creator);
     const res = await fetch('https://api.cloudinary.com/v1_1/dew7hucqf/image/upload', { method: 'POST', body: formData });
     const data = await res.json();
