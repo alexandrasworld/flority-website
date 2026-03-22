@@ -272,9 +272,10 @@
   }
   .pf.sel .rh { display: block; }
   .rot-handle {
-    position: absolute; top: -5px; right: -5px;
-    width: 11px; height: 11px; display: none; z-index: 10; cursor: grab;
-    background: var(--cream); border-radius: 50%;
+    position: absolute; top: -12px; right: -12px;
+    width: 22px; height: 22px; display: none; z-index: 10; cursor: grab;
+    background: #111; border: 1.5px solid var(--cream); border-radius: 50%;
+    font-size: 11px; line-height: 20px; text-align: center; color: var(--cream);
   }
   .pf.sel .rot-handle { display: block; }
 
@@ -567,7 +568,7 @@
     /* Bigger touch targets for flower controls */
     .cbtn { font-size: 0.82rem; padding: 5px 7px; }
     .rh { width: 20px; height: 20px; bottom: -7px; right: -7px; }
-    .rot-handle { width: 20px; height: 20px; top: -7px; right: -7px; }
+    .rot-handle { width: 28px; height: 28px; top: -14px; right: -14px; font-size: 14px; line-height: 26px; }
     .pf .ctrl { top: -36px; padding: 5px 9px; gap: 4px; }
 
     /* 3-col grid in palette */
@@ -1025,7 +1026,7 @@ function render(d) {
     ta.addEventListener('mousedown', e => e.stopPropagation());
     ta.addEventListener('touchstart', e => e.stopPropagation(), {passive:false});
   } else {
-    el.innerHTML = ctrlHtml + `<img src="${d.f.file}" alt="${d.f.name}" draggable="false"><div class="rh" id="rh_${d.uid}"></div><div class="rot-handle" id="roth_${d.uid}"></div>`;
+    el.innerHTML = ctrlHtml + `<img src="${d.f.file}" alt="${d.f.name}" draggable="false"><div class="rh" id="rh_${d.uid}"></div><div class="rot-handle" id="roth_${d.uid}">↻</div>`;
   }
   if (d.stem) {
     const si = document.createElement('img');
