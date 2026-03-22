@@ -271,6 +271,19 @@
     background: var(--cream); border-radius: 50%; cursor: se-resize; display: none; z-index: 10;
   }
   .pf.sel .rh { display: block; }
+  .rot-handle {
+    position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    width: 14px; height: 14px; display: none; z-index: 10; cursor: grab;
+  }
+  .rot-handle::before {
+    content: ''; position: absolute; inset: 0;
+    border: 1.5px solid var(--cream); border-radius: 50%;
+  }
+  .rot-handle::after {
+    content: ''; position: absolute; top: 100%; left: 50%;
+    width: 1.5px; height: 8px; background: var(--cream); transform: translateX(-50%);
+  }
+  .pf.sel .rot-handle { display: block; }
 
   /* RIGHT PANEL */
   .props {
@@ -561,6 +574,7 @@
     /* Bigger touch targets for flower controls */
     .cbtn { font-size: 0.82rem; padding: 5px 7px; }
     .rh { width: 20px; height: 20px; bottom: -7px; right: -7px; }
+    .rot-handle { width: 20px; height: 20px; top: -24px; }
     .pf .ctrl { top: -36px; padding: 5px 9px; gap: 4px; }
 
     /* 3-col grid in palette */
@@ -1018,7 +1032,7 @@ function render(d) {
     ta.addEventListener('mousedown', e => e.stopPropagation());
     ta.addEventListener('touchstart', e => e.stopPropagation(), {passive:false});
   } else {
-    el.innerHTML = ctrlHtml + `<img src="${d.f.file}" alt="${d.f.name}" draggable="false"><div class="rh" id="rh_${d.uid}"></div>`;
+    el.innerHTML = ctrlHtml + `<img src="${d.f.file}" alt="${d.f.name}" draggable="false"><div class="rh" id="rh_${d.uid}"></div><div class="rot-handle" id="roth_${d.uid}"></div>`;
   }
   if (d.stem) {
     const si = document.createElement('img');
@@ -1028,6 +1042,7 @@ function render(d) {
   }
   drag(el, d);
   resize(el, d);
+  rotateHandle(el, d);
   el.addEventListener('click', e => { e.stopPropagation(); sel(d.uid); });
   stage.appendChild(el);
 }
@@ -1048,14 +1063,14 @@ function drag(el, d) {
     el.style.left=d.x+'px'; el.style.top=d.y+'px';
   }
   el.addEventListener('mousedown', e => {
-    if (e.target.classList.contains('rh') || e.target.classList.contains('cbtn')) return;
+    if (e.target.classList.contains('rh') || e.target.classList.contains('rot-handle') || e.target.classList.contains('cbtn')) return;
     e.preventDefault(); startDrag(e.clientX, e.clientY);
     const mm = e2 => moveDrag(e2.clientX, e2.clientY);
     const mu = () => { document.removeEventListener('mousemove',mm); document.removeEventListener('mouseup',mu); };
     document.addEventListener('mousemove',mm); document.addEventListener('mouseup',mu);
   });
   el.addEventListener('touchstart', e => {
-    if (e.target.classList.contains('rh') || e.target.classList.contains('cbtn') || e.target.tagName === 'TEXTAREA') return;
+    if (e.target.classList.contains('rh') || e.target.classList.contains('rot-handle') || e.target.classList.contains('cbtn') || e.target.tagName === 'TEXTAREA') return;
     e.preventDefault(); sel(d.uid);
     const t = e.touches[0]; startDrag(t.clientX, t.clientY);
     const tm = e2 => { e2.preventDefault(); const t2=e2.touches[0]; moveDrag(t2.clientX, t2.clientY); };
@@ -1090,6 +1105,39 @@ function resize(el, d) {
     rh.addEventListener('touchmove', tm, {passive:false});
     rh.addEventListener('touchend', tu);
   }, {passive:false});
+}
+
+function rotateHandle(el, d) {
+  const roth = el.querySelector('.rot-handle');
+  if (!roth) return;
+  function getCenter() {
+    const sc = getStageScale();
+    const stage = document.getElementById('stage');
+    const rect = stage.getBoundingClientRect();
+    const cx = rect.left + (d.x + d.sz / 2) * sc;
+    const cy = rect.top + (d.y + d.sz / 2) * sc;
+    return { cx, cy };
+  }
+  function doRotate(clientX, clientY) {
+    const { cx, cy } = getCenter();
+    const angle = Math.atan2(clientX - cx, -(clientY - cy)) * 180 / Math.PI;
+    d.rot = Math.round(angle);
+    el.style.transform = tx(d);
+    if (d.uid === selId) syncSliders(d);
+  }
+  roth.addEventListener('mousedown', e => {
+    e.stopPropagation(); e.preventDefault();
+    const mm = e2 => doRotate(e2.clientX, e2.clientY);
+    const mu = () => { document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu); };
+    document.addEventListener('mousemove', mm); document.addEventListener('mouseup', mu);
+  });
+  roth.addEventListener('touchstart', e => {
+    e.stopPropagation(); e.preventDefault();
+    const tm = e2 => { e2.preventDefault(); doRotate(e2.touches[0].clientX, e2.touches[0].clientY); };
+    const tu = () => { roth.removeEventListener('touchmove', tm); roth.removeEventListener('touchend', tu); };
+    roth.addEventListener('touchmove', tm, {passive: false});
+    roth.addEventListener('touchend', tu);
+  }, {passive: false});
 }
 
 function sel(uid) {
